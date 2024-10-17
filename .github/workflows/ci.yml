@@ -27,13 +27,3 @@ jobs:
             mkdocs-material-
       - run: pip install mkdocs-material 
       - run: mkdocs gh-deploy --force
-
-$ tree -a
-.
-├── .github
-│   ├── .DS_Store
-│   └── workflows
-│       └── ci.yml
-├── docs
-│   └── index.md
-└── mkdocs.yml
