@@ -2,35 +2,48 @@ name: ci
 on:
   push:
     branches:
-      - main  # 修改为实际使用的分支
+      - master 
+      - main
 permissions:
   contents: write
 jobs:
   deploy:
     runs-on: ubuntu-latest
     steps:
+      # Step 1: Checkout the repository
       - uses: actions/checkout@v4
+      
+      # Step 2: Configure Git Credentials
       - name: Configure Git Credentials
         run: |
           git config user.name github-actions[bot]
           git config user.email 41898282+github-actions[bot]@users.noreply.github.com
-      - name: Setup Python
-        uses: actions/setup-python@v4
+
+      # Step 3: Setup Python environment
+      - uses: actions/setup-python@v4
         with:
-          python-version: '3.x'
-      - name: Setup Node.js
-        uses: actions/setup-node@v3
-        with:
-          node-version: '20'
-      - run: echo "cache_id=$(date --utc '+%V')" >> $GITHUB_ENV 
-      - uses: actions/cache@v3
-        with:
-          key: mkdocs-material-${{ env.cache_id }}
-          path: .cache  # 确保这个路径有效
-          restore-keys: |
-            mkdocs-material-
-      - run: pip install mkdocs-material
-      - name: List Files  # 列出当前文件，调试用
+          python-version: 3.x
+
+      # Step 4: Install MkDocs Material theme
+      - name: Install MkDocs Material
+        run: pip install mkdocs-material
+
+      # Step 5: Check MkDocs version to ensure it's installed correctly
+      - name: Check MkDocs version
+        run: mkdocs --version
+
+      # Step 6: List files to confirm structure (optional for debugging)
+      - name: List Files in Root Directory
         run: ls -la
+
+      # Step 7: List files in the 'docs' directory (ensure it exists)
+      - name: List Files in Docs Directory
+        run: ls -la docs
+
+      # Step 8: Build the MkDocs site to check for build errors
+      - name: Build MkDocs site
+        run: mkdocs build
+
+      # Step 9: Deploy to GitHub Pages
       - name: Deploy to GitHub Pages
         run: mkdocs gh-deploy --force
