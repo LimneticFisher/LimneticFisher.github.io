@@ -1,49 +1,18 @@
-name: ci
-on:
-  push:
+name: publish site
+on: # 在什么时候触发工作流
+  push: # 在从本地main分支被push到GitHub仓库时
     branches:
-      - master 
       - main
-permissions:
-  contents: write
-jobs:
+  pull_request: # 在main分支合并别人提的pr时
+    branches:
+      - main
+jobs: # 工作流的具体内容
   deploy:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-latest # 创建一个新的云端虚拟机 使用最新Ubuntu系统
     steps:
-      # Step 1: Checkout the repository
-      - uses: actions/checkout@v4
-      
-      # Step 2: Configure Git Credentials
-      - name: Configure Git Credentials
-        run: |
-          git config user.name github-actions[bot]
-          git config user.email 41898282+github-actions[bot]@users.noreply.github.com
-
-      # Step 3: Setup Python environment
-      - uses: actions/setup-python@v4
+      - uses: actions/checkout@v2 # 先checkout到main分支
+      - uses: actions/setup-python@v2 # 再安装Python3和相关环境
         with:
           python-version: 3.x
-
-      # Step 4: Install MkDocs Material theme
-      - name: Install MkDocs Material
-        run: pip install mkdocs-material
-
-      # Step 5: Check MkDocs version to ensure it's installed correctly
-      - name: Check MkDocs version
-        run: mkdocs --version
-
-      # Step 6: List files to confirm structure (optional for debugging)
-      - name: List Files in Root Directory
-        run: ls -la
-
-      # Step 7: List files in the 'docs' directory (ensure it exists)
-      - name: List Files in Docs Directory
-        run: ls -la docs
-
-      # Step 8: Build the MkDocs site to check for build errors
-      - name: Build MkDocs site
-        run: mkdocs build
-
-      # Step 9: Deploy to GitHub Pages
-      - name: Deploy to GitHub Pages
-        run: mkdocs gh-deploy --force
+      - run: pip install mkdocs-material # 使用pip包管理工具安装mkdocs-material
+      - run: mkdocs gh-deploy --force # 使用mkdocs-material部署gh-pages分支
