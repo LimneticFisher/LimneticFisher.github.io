@@ -58,6 +58,8 @@
   
     
     
+      
+    
     
     
     
@@ -68,6 +70,11 @@
     <input class="md-toggle" data-md-toggle="search" type="checkbox" id="__search" autocomplete="off">
     <label class="md-overlay" for="__drawer"></label>
     <div data-md-component="skip">
+      
+        
+        <a href="#_1" class="md-skip">
+          Skip to content
+        </a>
       
     </div>
     <div data-md-component="announce">
@@ -109,7 +116,33 @@
     </div>
     
       
+        <form class="md-header__option" data-md-component="palette">
+  
     
+    
+    
+    <input class="md-option" data-md-color-media="(prefers-color-scheme: light)" data-md-color-scheme="default" data-md-color-primary="black" data-md-color-accent="indigo"  aria-label="切换至夜间模式"  type="radio" name="__palette" id="__palette_0">
+    
+      <label class="md-header__button md-icon" title="切换至夜间模式" for="__palette_1" hidden>
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M17 7H7a5 5 0 0 0-5 5 5 5 0 0 0 5 5h10a5 5 0 0 0 5-5 5 5 0 0 0-5-5m0 8a3 3 0 0 1-3-3 3 3 0 0 1 3-3 3 3 0 0 1 3 3 3 3 0 0 1-3 3"/></svg>
+      </label>
+    
+  
+    
+    
+    
+    <input class="md-option" data-md-color-media="(prefers-color-scheme: dark)" data-md-color-scheme="slate" data-md-color-primary="black" data-md-color-accent="indigo"  aria-label="切换至日间模式"  type="radio" name="__palette" id="__palette_1">
+    
+      <label class="md-header__button md-icon" title="切换至日间模式" for="__palette_0" hidden>
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M17 6H7c-3.31 0-6 2.69-6 6s2.69 6 6 6h10c3.31 0 6-2.69 6-6s-2.69-6-6-6m0 10H7c-2.21 0-4-1.79-4-4s1.79-4 4-4h10c2.21 0 4 1.79 4 4s-1.79 4-4 4M7 9c-1.66 0-3 1.34-3 3s1.34 3 3 3 3-1.34 3-3-1.34-3-3-3"/></svg>
+      </label>
+    
+  
+</form>
+      
+    
+    
+      <script>var palette=__md_get("__palette");if(palette&&palette.color){if("(prefers-color-scheme)"===palette.color.media){var media=matchMedia("(prefers-color-scheme: light)"),input=document.querySelector(media.matches?"[data-md-color-media='(prefers-color-scheme: light)']":"[data-md-color-media='(prefers-color-scheme: dark)']");palette.color.media=input.getAttribute("data-md-color-media"),palette.color.scheme=input.getAttribute("data-md-color-scheme"),palette.color.primary=input.getAttribute("data-md-color-primary"),palette.color.accent=input.getAttribute("data-md-color-accent")}for(var[key,value]of Object.entries(palette.color))document.body.setAttribute("data-md-color-"+key,value)}</script>
     
     
     
@@ -220,6 +253,19 @@
       <input class="md-nav__toggle md-toggle" type="checkbox" id="__toc">
       
       
+        
+      
+      
+        <label class="md-nav__link md-nav__link--active" for="__toc">
+          
+  
+  <span class="md-ellipsis">
+    Page1
+  </span>
+  
+
+          <span class="md-nav__icon md-icon"></span>
+        </label>
       
       <a href="./" class="md-nav__link md-nav__link--active">
         
@@ -230,6 +276,238 @@
   
 
       </a>
+      
+        
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#test" class="md-nav__link">
+    <span class="md-ellipsis">
+      一、电子资源test
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#_2" class="md-nav__link">
+    <span class="md-ellipsis">
+      二、中国古代史史料搜索
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="二、中国古代史史料搜索">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#_3" class="md-nav__link">
+    <span class="md-ellipsis">
+      （一）中国大陆
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="（一）中国大陆">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#1" class="md-nav__link">
+    <span class="md-ellipsis">
+      1、国家图书馆
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#2" class="md-nav__link">
+    <span class="md-ellipsis">
+      2、第一历史档案馆
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#3" class="md-nav__link">
+    <span class="md-ellipsis">
+      3、各地历史文献数据库以及各地图书馆数据库
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#4" class="md-nav__link">
+    <span class="md-ellipsis">
+      4、其他
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#_4" class="md-nav__link">
+    <span class="md-ellipsis">
+      （二）台湾资料数据库
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="（二）台湾资料数据库">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#1_1" class="md-nav__link">
+    <span class="md-ellipsis">
+      1、故宫博物院
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#2_1" class="md-nav__link">
+    <span class="md-ellipsis">
+      2、台湾图书馆
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#3_1" class="md-nav__link">
+    <span class="md-ellipsis">
+      3、史语所
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#4_1" class="md-nav__link">
+    <span class="md-ellipsis">
+      4、傅斯年图书馆
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#5thdl" class="md-nav__link">
+    <span class="md-ellipsis">
+      5、台灣歷史數位圖書館(THDL)
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#_5" class="md-nav__link">
+    <span class="md-ellipsis">
+      （三）美国国会与哈佛燕京大学数据库
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#_6" class="md-nav__link">
+    <span class="md-ellipsis">
+      （五）日本数据库
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#_7" class="md-nav__link">
+    <span class="md-ellipsis">
+      （六）韩国数据库
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#_8" class="md-nav__link">
+    <span class="md-ellipsis">
+      （七）其他国家数据库
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#_9" class="md-nav__link">
+    <span class="md-ellipsis">
+      （八）全球漢籍影像開放集成系統
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#_10" class="md-nav__link">
+    <span class="md-ellipsis">
+      三、中国近代史史料搜索
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="三、中国近代史史料搜索">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#_11" class="md-nav__link">
+    <span class="md-ellipsis">
+      （一）各类报刊数据库
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#_12" class="md-nav__link">
+    <span class="md-ellipsis">
+      （二）各类档案数据库
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+    </ul>
+  
+</nav>
       
     </li>
   
@@ -252,6 +530,229 @@
   
   
   
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#test" class="md-nav__link">
+    <span class="md-ellipsis">
+      一、电子资源test
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#_2" class="md-nav__link">
+    <span class="md-ellipsis">
+      二、中国古代史史料搜索
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="二、中国古代史史料搜索">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#_3" class="md-nav__link">
+    <span class="md-ellipsis">
+      （一）中国大陆
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="（一）中国大陆">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#1" class="md-nav__link">
+    <span class="md-ellipsis">
+      1、国家图书馆
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#2" class="md-nav__link">
+    <span class="md-ellipsis">
+      2、第一历史档案馆
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#3" class="md-nav__link">
+    <span class="md-ellipsis">
+      3、各地历史文献数据库以及各地图书馆数据库
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#4" class="md-nav__link">
+    <span class="md-ellipsis">
+      4、其他
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#_4" class="md-nav__link">
+    <span class="md-ellipsis">
+      （二）台湾资料数据库
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="（二）台湾资料数据库">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#1_1" class="md-nav__link">
+    <span class="md-ellipsis">
+      1、故宫博物院
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#2_1" class="md-nav__link">
+    <span class="md-ellipsis">
+      2、台湾图书馆
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#3_1" class="md-nav__link">
+    <span class="md-ellipsis">
+      3、史语所
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#4_1" class="md-nav__link">
+    <span class="md-ellipsis">
+      4、傅斯年图书馆
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#5thdl" class="md-nav__link">
+    <span class="md-ellipsis">
+      5、台灣歷史數位圖書館(THDL)
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#_5" class="md-nav__link">
+    <span class="md-ellipsis">
+      （三）美国国会与哈佛燕京大学数据库
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#_6" class="md-nav__link">
+    <span class="md-ellipsis">
+      （五）日本数据库
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#_7" class="md-nav__link">
+    <span class="md-ellipsis">
+      （六）韩国数据库
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#_8" class="md-nav__link">
+    <span class="md-ellipsis">
+      （七）其他国家数据库
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#_9" class="md-nav__link">
+    <span class="md-ellipsis">
+      （八）全球漢籍影像開放集成系統
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#_10" class="md-nav__link">
+    <span class="md-ellipsis">
+      三、中国近代史史料搜索
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="三、中国近代史史料搜索">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#_11" class="md-nav__link">
+    <span class="md-ellipsis">
+      （一）各类报刊数据库
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#_12" class="md-nav__link">
+    <span class="md-ellipsis">
+      （二）各类档案数据库
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+    </ul>
   
 </nav>
                   </div>
@@ -266,10 +767,8 @@
                   
 
 
-  <h1>Page1</h1>
-
-<p><strong># 天下皆知取之爲取，而莫知與之爲取</strong></p>
-<p><strong>## 一、电子资源</strong></p>
+<h1 id="_1">天下皆知取之爲取，而莫知與之爲取</h1>
+<h2 id="test">一、电子资源test</h2>
 <p>•<a href="http://www.ncpssd.cn/">国家哲学社会科学文献中心</a></p>
 <p>•华艺《台湾学术文献数据库》</p>
 <p>•Springer Link电子期刊</p>
@@ -293,13 +792,13 @@
 <p>3、台湾大学学术期刊数据库<a href="http://tul.blog.ntu.edu.tw/archives/1805">如何得知臺大學術期刊的最新出版卷期呢？ </a><a href="http://tul.blog.ntu.edu.tw/archives/1805">– </a><a href="http://tul.blog.ntu.edu.tw/archives/1805">國立臺灣大學圖書館參考服務部落格 </a><a href="http://tul.blog.ntu.edu.tw/archives/1805">(ntu.edu.tw)</a></p>
 <p>4、<a href="https://sungshih.asiademo.com/">臺灣宋史研究網 </a><a href="https://sungshih.asiademo.com/">| </a><a href="https://sungshih.asiademo.com/">中央研究院 歷史語言研究所 </a><a href="https://sungshih.asiademo.com/">(asiademo.com)</a></p>
 <p>5、<a href="https://homepage.ntu.edu.tw/~bcla/intro.htm">臺大文史哲學報</a><a href="https://homepage.ntu.edu.tw/~bcla/intro.htm">-</a><a href="https://homepage.ntu.edu.tw/~bcla/intro.htm">簡介</a></p>
-<p><strong>## 二、中国古代史史料搜索</strong></p>
-<p><strong>### （一）中国大陆</strong></p>
-<p><strong>#### 1、国家图书馆</strong></p>
+<h2 id="_2">二、中国古代史史料搜索</h2>
+<h3 id="_3">（一）中国大陆</h3>
+<h4 id="1">1、国家图书馆</h4>
 <p>•<a href="https://www.nlc.cn/web/index.shtml">中国国家图书馆·中国国家数字图书馆·国家典籍博物馆</a></p>
-<p><strong>#### 2、第一历史档案馆</strong></p>
+<h4 id="2">2、第一历史档案馆</h4>
 <p>•<a href="https://fhac.com.cn/index.html">中国第一历史档案馆(fhac.com.cn)</a></p>
-<p><strong>#### 3、各地历史文献数据库以及各地图书馆数据库</strong></p>
+<h4 id="3">3、各地历史文献数据库以及各地图书馆数据库</h4>
 <p>•<a href="http://njx.njcbs.cn/">南京历史文献数据库(njcbs.cn)</a></p>
 <p>•<a href="https://history.zjlib.cn/?pageId=107556&amp;wfwfid=2120&amp;websiteId=73953">浙江省历史文献数据库(zjlib.cn)</a></p>
 <p>•<a href="https://gj.library.sh.cn/org/shl">上海圖書館古籍目錄(library.sh.cn)</a></p>
@@ -312,46 +811,46 @@
 <p>•<a href="https://xieben.cadal.edu.cn/">中国写本文献数字资源库(cadal.edu.cn)</a></p>
 <p>•<a href="http://www.xueheng.net/shbk.html">学衡数据(xueheng.net)</a></p>
 <p>•<a href="https://ident.familysearch.org/identity/login/?state=https://www.familysearch.org/frontier/search-bifrost/image/index">家谱搜索(familysearch.org)</a></p>
-<p><strong>#### 4、其他</strong></p>
+<h4 id="4">4、其他</h4>
 <p><a href="http://aiguji.net/">古籍文献馆(aiguji.net)</a></p>
 <p><a href="http://www.gmzm.org/">古籍字画分享</a></p>
 <p><a href="https://new.shuge.org/">书格</a></p>
 <p><a href="www.hongyeshan.com">红叶山古籍文库</a></p>
-<p><strong>### （二）台湾资料数据库</strong></p>
-<p><strong>#### 1、故宫博物院</strong></p>
+<h3 id="_4">（二）台湾资料数据库</h3>
+<h4 id="1_1">1、故宫博物院</h4>
 <p>•<a href="npm.gov.tw">國立故宮博物院</a></p>
 <p>•<a href="https://qingarchives.npm.edu.tw/index.php">清代档案检索系统</a></p>
-<p><strong>#### 2、台湾图书馆</strong></p>
+<h4 id="2_1">2、台湾图书馆</h4>
 <p>•<a href="https://rbook.ncl.edu.tw/NCLSearch/">古籍與特藏文獻資源-國家圖書館</a></p>
-<p><strong>#### 3、史语所</strong></p>
+<h4 id="3_1">3、史语所</h4>
 <p>•<a href="https://www1.ihp.sinica.edu.tw/Resource/Database">學術資源｜中央研究院歷史語言研究所</a></p>
-<p><strong>#### 4、傅斯年图书馆</strong></p>
+<h4 id="4_1">4、傅斯年图书馆</h4>
 <p>•<a href="http://lib.ihp.sinica.edu.tw/sitemap.php">傅斯年圖書館中文網頁:網站導覽</a></p>
-<p><strong>#### 5、台灣歷史數位圖書館(THDL)</strong> </p>
+<h4 id="5thdl">5、台灣歷史數位圖書館(THDL)</h4>
 <p>•<a href="https://thdl.ntu.edu.tw/index.html">台灣歷史數位圖書館</a></p>
-<p><strong>### （三）美国国会与哈佛燕京大学数据库</strong></p>
+<h3 id="_5">（三）美国国会与哈佛燕京大学数据库</h3>
 <p>•<a href="https://guides.library.harvard.edu/Chinese?utm_source=Library+Staff&amp;utm_campaign=9fca5a7bb3-EMAIL_CAMPAIGN_2017_06_28&amp;utm_medium=email&amp;utm_term=0_4bb25c0228-9fca5a7bb3-26352423">Home - Research Guide for Chinese Studies - Research Guides at Harvard Library</a></p>
 <p>•<a href="https://www.loc.gov/collections/chinese-rare-books/about-this-collection/">About this Collection | Chinese Rare Book Digital Collection | Digital Collections | Library of Congress</a></p>
-<p><strong>### （五）日本数据库</strong></p>
+<h3 id="_6">（五）日本数据库</h3>
 <p>•<a href="http://shanben.ioc.u-tokyo.ac.jp/">东洋文库東京大学 東洋文化研究所 漢籍善本全文影像資料庫</a></p>
 <p>•<a href="https://rmda.kulib.kyoto-u.ac.jp/collection/kawai?status=1&amp;page=8">京都大学河合文庫 | 京都大学貴重資料デジタルアーカイブ</a></p>
 <p>•<a href="https://www.digital.archives.go.jp/">公文图书馆国立公文書館 デジタルアーカイブ</a></p>
 <p>•<a href="https://dl.ndl.go.jp/">国立国会図書館デジタルコレクション</a></p>
 <p>•<a href="https://www.wul.waseda.ac.jp/kotenseki/index.html">早稻田大学古典籍総合データベース</a></p>
-<p><strong>### （六）韩国数据库</strong></p>
+<h3 id="_7">（六）韩国数据库</h3>
 <p>•<a href="https://sillok.history.go.kr/main/main.do">한국사데이터베이스</a></p>
 <p>•<a href="history.go.kr">明清实录명·청실록</a></p>
-<p><strong>### （七）其他国家数据库</strong></p>
+<h3 id="_8">（七）其他国家数据库</h3>
 <p>•<a href="shttps://digital.staatsbibliothek-berlin.de/">德国柏林 Digitalisierte Sammlungen der Staatsbibliothek zu Berlin: Startseite</a></p>
 <p>•<a href="https://ostasien.digitale-sammlungen.de/?locale=cn">巴伐利亚国家图书馆 DIGITALE SAMMLUNGEN OSTASIEN</a></p>
 <p>•<a href="https://cudl.lib.cam.ac.uk/collections/chinese/2">剑桥Chinese Works</a></p>
 <p>•<a href="https://dpul.princeton.edu/eastasian/browse/all-exhibit-items">普林斯顿All Exhibit Items | Digital PUL</a></p>
 <p>•<a href="https://chcdatabase.com/zh/#about">中国基督教历史资料库</a></p>
 <p>•<a href="ubc.ca">Home - Xinjiang Documentation Project</a></p>
-<p><strong>### （八）全球漢籍影像開放集成系統</strong> </p>
+<h3 id="_9">（八）全球漢籍影像開放集成系統</h3>
 <p>•<a href="https://guji.wenxianxue.cn/">全球漢籍影像開放集成系統</a></p>
-<p><strong>## 三、中国近代史史料搜索</strong></p>
-<p><strong>### （一）各类报刊数据库</strong></p>
+<h2 id="_10">三、中国近代史史料搜索</h2>
+<h3 id="_11">（一）各类报刊数据库</h3>
 <p>•<a href="http://zh.academic.ancientbooks.cn/docMgqk/">首页-民国期刊全文数据库</a></p>
 <p>•<a href="https://www.neohytung.com/">瀚堂近代报刊数据库</a></p>
 <p>•<a href="https://gpa.eastview.com/crl/lqrcn/">晚清和民国时期中文报纸集</a></p>
@@ -361,7 +860,7 @@
 <p>•<a href="https://taiwanebook.ncl.edu.tw/en">Taiwan eBook</a></p>
 <p>•<a href="https://www.proquest.com/ne">ProQuest | 更好的研究，更好的学习，更好的见解。近现代中国英文报纸库（ProQuest Historical Newspapers:Chinese Newspapers Collection, 1832-1953</a></p>
 <p>•<a href="https://www.china.amdigital.co.uk/">China: Trade, Politics &amp; Culture - Adam Matthew Digital(海外收藏的中国近代史珍稀史料文献库)</a></p>
-<p><strong>### （二）各类档案数据库</strong></p>
+<h3 id="_12">（二）各类档案数据库</h3>
 <p>•<a href="https://www.modernhistory.org.cn/">抗日战争与近代中日关系文献数据平台(modernhistory.org.cn)</a></p>
 <p>•<a href="https://minjian-danganguan.org/zh/about">中国民间档案馆</a></p>
 <p>•<a href="https://mhdb.mh.sinica.edu.tw/index.php">台湾近代史所书数据库</a></p>
