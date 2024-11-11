@@ -1,5 +1,9 @@
-# 天下皆知取之爲取，而莫知與之爲取
-## 一、电子资源testssss
+# 资源指北
+![image](images/baihetu.jpg)
+
+    非月非云非鹤
+
+## 一、期刊数据库
 
 •[国家哲学社会科学文献中心](http://www.ncpssd.cn/)
 
@@ -53,7 +57,7 @@
 
 #### 1、国家图书馆
 
-•[中国国家图书馆·中国国家数字图书馆·国家典籍博物馆](https://www.nlc.cn/web/index.shtml)
+•[中国国家图书馆·中国国家数字图书馆·国家典籍博物馆⭐⭐](https://www.nlc.cn/web/index.shtml)
 
 #### 2、第一历史档案馆
 
@@ -63,7 +67,7 @@
 
 •[南京历史文献数据库(njcbs.cn)](http://njx.njcbs.cn/)
 
-•[浙江省历史文献数据库(zjlib.cn)](https://history.zjlib.cn/?pageId=107556&wfwfid=2120&websiteId=73953)
+•[浙江省历史文献数据库(zjlib.cn)⭐](https://history.zjlib.cn/?pageId=107556&wfwfid=2120&websiteId=73953)
 
 •[上海圖書館古籍目錄(library.sh.cn)](https://gj.library.sh.cn/org/shl)
 
@@ -87,21 +91,29 @@
 
 #### 4、其他
 
-[古籍文献馆(aiguji.net)](http://aiguji.net/)
+•[古籍文献馆(aiguji.net)](http://aiguji.net/)
 
-[古籍字画分享](http://www.gmzm.org/)
+•[古籍字画分享](http://www.gmzm.org/)
 
-[书格](https://new.shuge.org/)
+•[书格⭐](https://new.shuge.org/)
 
-[红叶山古籍文库](www.hongyeshan.com)
+•[红叶山古籍文库⭐⭐](https://hongyeshan.com/)
+
+•[中国哲学书电子化计划⭐⭐](https://ctext.org/zhs)
+
+•[明清实录](https://hanchi.ihp.sinica.edu.tw/mql/login.html)
+
+•[爱如生中国基本古籍库](https://webvpn.zjnu.edu.cn/http/77726476706e69737468656265737421f4ff0f993523625b300b86a1/jsp/front/prodlist.jsp)
+
+•[中国经典古籍库](https://webvpn.zjnu.edu.cn/https/77726476706e69737468656265737421e7e056d2263e6b597b069dae975a282664a08a/)
 
 ### （二）台湾资料数据库
 
 #### 1、故宫博物院
 
-•[國立故宮博物院](npm.gov.tw)
+•[國立故宮博物院](http://npm.gov.tw/)
 
-•[清代档案检索系统](https://qingarchives.npm.edu.tw/index.php)
+•[清代档案检索系统⭐⭐](https://qingarchives.npm.edu.tw/index.php)
 
 #### 2、台湾图书馆
 
@@ -141,7 +153,7 @@
 
 •[한국사데이터베이스](https://sillok.history.go.kr/main/main.do)
 
-•[明清实录명·청실록](history.go.kr)
+•[明清实录명·청실록⭐](https://sillok.history.go.kr/mc/main.do)
 
 ### （七）其他国家数据库
 
@@ -155,17 +167,17 @@
 
 •[中国基督教历史资料库](https://chcdatabase.com/zh/#about)
 
-•[Home - Xinjiang Documentation Project](ubc.ca)
+•[Home - Xinjiang Documentation Project](https://www.ubc.ca/)
 
 ### （八）全球漢籍影像開放集成系統
 
-•[全球漢籍影像開放集成系統](https://guji.wenxianxue.cn/)
+•[全球漢籍影像開放集成系統⭐](https://guji.wenxianxue.cn/)
 
 ## 三、中国近代史史料搜索
 
 ### （一）各类报刊数据库
 
-•[首页-民国期刊全文数据库](http://zh.academic.ancientbooks.cn/docMgqk/)
+•[首页-民国期刊全文数据库⭐](http://zh.academic.ancientbooks.cn/docMgqk/)
 
 •[瀚堂近代报刊数据库](https://www.neohytung.com/)
 
@@ -204,3 +216,23 @@
 •[Hoji Shinbun Digital Collection (hoover.org)](https://hojishinbun.hoover.org/?a=p&p=home&e=-------en-10--41--img-衢州+------)
 
 •[The National Archives](https://www.nationalarchives.gov.uk/)
+
+## 三、世界史
+
+•[数据库｜世界史专业常用数据库（更新中）](https://mp.weixin.qq.com/s/EarZNqSI19VNDmcSZvapDQ)
+
+## 四、工具索引类
+
+•[中国古典文献资源导航系统⭐⭐⭐⭐⭐](https://www.wenxianxue.cn/)
+
+•[史语所人物传记资料库](https://newarchive.ihp.sinica.edu.tw/sncaccgi/sncacFtp?@@158)
+
+•[清代职官资料库](https://newarchive.ihp.sinica.edu.tw/officerc/officertp?ID=1458&SECU=51490929&PAGE=officerdb/search@@776628045)
+
+•[清季职官表查询系统](http://ssop.digital.ntu.edu.tw)
+
+•[上图人名地名数据库链接](https://data.library.sh.cn/index)
+
+•[清代缙绅录量化数据库](http://vis.cse.ust.hk/searchjsl/)
+
+•[中国历代人物传记资料库](http://db1.ihp.sinica.edu.tw/cbdbc/ttsweb?@0:0:1:cbdbkm@@0.8933508103192395)
