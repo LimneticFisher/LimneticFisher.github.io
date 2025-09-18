@@ -1,207 +1,139 @@
-/* custom_theme/css/style.css */
+/* --- 1. 定义颜色变量 --- */
+:root {
+    /* 日间模式颜色 (默认) */
+    --bg-primary: #9d3c47;       /* 主背景色 (棕红色) */
+    --bg-secondary: #fdfbf7;      /* 次背景色 (米白色) */
+    --text-primary: #ffffff;      /* 主文本色 (白色) */
+    --text-secondary: #f0f0f0;    /* 次文本色 (浅灰色) */
+    --text-hero: #ffffff;         /* 英雄区域大标题颜色 */
+    --search-bg: rgba(0, 0, 0, 0.2);
+    --search-border: rgba(255, 255, 255, 0.2);
+    --search-placeholder: rgba(255, 255, 255, 0.6);
+    --search-button-bg: #ffc107;
+    --search-button-text: #333;
+    --header-link: #ffffff;
+    --footer-bg: #343a40;
+    --footer-text: #ffffff;
+}
 
-/* --- 全局重置 --- */
+html.dark-mode {
+    /* 夜间模式颜色 (当 <html> 标签有 .dark-mode 类时生效) */
+    --bg-primary: #1a1a1a;       /* 主背景色 (深灰色) */
+    --bg-secondary: #242424;      /* 次背景色 (浅一点的灰色) */
+    --text-primary: #e0e0e0;      /* 主文本色 (灰白色) */
+    --text-secondary: #b3b3b3;    /* 次文本色 (灰色) */
+    --text-hero: #ffffff;         /* 英雄区域大标题颜色 */
+    --search-bg: rgba(255, 255, 255, 0.1);
+    --search-border: rgba(255, 255, 255, 0.3);
+    --search-placeholder: rgba(255, 255, 255, 0.5);
+    --search-button-bg: #8a6100;
+    --search-button-text: #ffffff;
+    --header-link: #e0e0e0;
+    --footer-bg: #121212;
+    --footer-text: #e0e0e0;
+}
+
+
+/* --- 2. 重构现有样式，使用变量 --- */
 html, body {
-    margin: 0;
-    padding: 0;
-    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
-    background-color: #fff; /* 为非首页设置一个干净的白色背景 */
+    margin: 0; padding: 0;
+    font-family: 'Noto Sans SC', sans-serif;
+    background-color: var(--bg-secondary); /* 使用变量 */
+    transition: background-color 0.3s ease; /* 添加平滑过渡效果 */
 }
 
-/* --- 悬浮 Header 样式 --- */
 .header {
-    position: absolute;
-    top: 0;
-    left: 0;
-    width: 100%;
-    z-index: 1000;
-    background-color: transparent;
-    transition: background-color 0.3s ease;
+    position: absolute; top: 0; left: 0;
+    width: 100%; z-index: 1000;
 }
-
 .header-container {
-    max-width: 1440px;
-    margin: 0 auto;
-    padding: 25px 40px;
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    box-sizing: border-box;
+    max-width: 1440px; margin: 0 auto; padding: 25px 40px;
+    display: flex; justify-content: flex-end; align-items: center; box-sizing: border-box;
 }
-
 .header-brand {
-    font-size: 1.5rem;
-    font-weight: bold;
-    color: white;
+    font-size: 1.5rem; font-weight: bold;
+    color: var(--header-link); /* 使用变量 */
     text-decoration: none;
 }
-
-.header-nav ul {
-    margin: 0;
-    padding: 0;
-    list-style: none;
-    display: flex;
-}
-
-.header-nav li {
-    margin-left: 35px;
-}
-
+.header-right-controls { display: flex; align-items: center; gap: 20px; } /* 新增 */
+.header-nav ul { margin: 0; padding: 0; list-style: none; display: flex; }
+.header-nav li { margin-left: 35px; }
 .header-nav a {
-    color: white;
-    text-decoration: none;
-    font-size: 1rem;
-    font-weight: 500;
+    color: var(--header-link); /* 使用变量 */
+    text-decoration: none; font-size: 1rem; font-weight: 500;
     transition: color 0.3s;
 }
+.header-nav a:hover { color: var(--search-button-bg); } /* 使用变量 */
 
-.header-nav a:hover {
-    color: #F8C471;
-}
-
-
-/* --- 主要内容区域 --- */
-.main-content {
-    margin: 0;
-    padding: 0;
-    display: block;
-}
-
-
-/* --- 全屏 Hero Section 样式 --- */
+.main-content { margin: 0; padding: 0; display: block; }
 .hero-section {
-    display: flex;
-    width: 100%;
-    min-height: 100vh; /* 关键：确保高度至少为整个屏幕 */
-    box-sizing: border-box;
+    display: flex; width: 100%; min-height: 100vh; box-sizing: border-box;
 }
-
-/* 左侧图片列 */
 .hero-image-column {
-    flex: 1 1 50%; /* 占据50%宽度 */
-    position: relative; /* 用于图片定位 */
+    flex: 1 1 50%; position: relative;
+    background-color: var(--bg-secondary); /* 使用变量 */
 }
+.image-zoom-container { position: absolute; top: 0; left: 0; width: 100%; height: 100%; overflow: hidden; }
+.image-zoom-container img { width: 100%; height: 100%; object-fit: cover; transition: transform 0.4s ease-out; }
+.image-zoom-container:hover img { transform: scale(1.05); }
 
-.image-zoom-container {
-    position: absolute;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    overflow: hidden; /* 关键：实现缩放效果 */
-}
-
-.image-zoom-container img {
-    width: 100%;
-    height: 100%;
-    object-fit: cover; /* 关键：让任意图片都能填满容器而不变形 */
-    transition: transform 0.4s ease-out;
-}
-
-.image-zoom-container:hover img {
-    transform: scale(1.05); /* 悬停时放大5% */
-}
-
-/* 右侧文本列 */
 .hero-text-column {
-    flex: 1 1 50%;
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
-    align-items: flex-start; /* 左对齐 */
-    padding: 4rem;
-    box-sizing: border-box;
-    background-color: #8E443D; /* 深紫红色背景 #F8C471*/
-    color: white;
+    flex: 1 1 50%; display: flex; flex-direction: column;
+    justify-content: center; align-items: flex-start;
+    padding: 4rem; box-sizing: border-box;
+    background-color: var(--bg-primary); /* 使用变量 */
+    color: var(--text-primary); /* 使用变量 */
+    transition: background-color 0.3s ease; /* 添加平滑过渡效果 */
 }
+.hero-text-column h1 { font-size: 4.5rem; font-weight: bold; line-height: 1.2; margin: 0 0 1rem 0; color: var(--text-hero); }
+.hero-subtitle { font-size: 1.25rem; margin-bottom: 2.5rem; color: var(--text-secondary); max-width: 500px; }
 
-.hero-text-column h1 {
-    font-size: 4.5rem;
-    font-weight: bold;
-    line-height: 1.2;
-    margin-top: 0;
-    margin-bottom: 1rem;
-    color: white;
-}
-
-.hero-subtitle {
-    font-size: 1.25rem;
-    margin-bottom: 2.5rem;
-    color: rgba(255, 255, 255, 0.85);
-    max-width: 500px;
-}
-
-/* 搜索框样式 */
 .search-container { width: 100%; max-width: 450px; }
-.bing-search-form { display: flex; border-radius: 50px; overflow: hidden; background-color: rgba(0, 0, 0, 0.2); border: 1px solid rgba(255, 255, 255, 0.2); }
-.bing-search-form input { flex-grow: 1; border: none; padding: 12px 20px; font-size: 1rem; background: transparent; color: white; outline: none; }
-.bing-search-form input::placeholder { color: rgba(255, 255, 255, 0.6); }
-.bing-search-form button { display: grid; place-items: center; border: none; background-color: #ffffff; color: #333; padding: 0 18px; cursor: pointer; transition: background-color 0.3s; }
-.bing-search-form button:hover { background-color: #ffc107; }
+.bing-search-form { display: flex; border-radius: 50px; overflow: hidden; background-color: var(--search-bg); border: 1px solid var(--search-border); }
+.bing-search-form input { flex-grow: 1; border: none; padding: 12px 20px 12px 55px; font-size: 1rem; background: transparent; color: var(--text-primary); outline: none; }
+.bing-search-form input::placeholder { color: var(--search-placeholder); }
+.bing-search-form button[type="submit"] { display: grid; place-items: center; border: none; background-color: var(--search-button-bg); color: var(--search-button-text); padding: 0 18px; cursor: pointer; transition: background-color 0.3s; }
+.bing-search-form button[type="submit"]:hover { filter: brightness(1.1); }
+#search-engine-switch { position: absolute; left: 0; top: 0; height: 100%; width: 50px; background: transparent; border: none; cursor: pointer; display: flex; align-items: center; justify-content: center; border-radius: 50px 0 0 50px; transition: background-color 0.2s; }
+#search-engine-switch:hover { background-color: rgba(0, 0, 0, 0.1); }
+.hidden { display: none; }
+
+.footer { background-color: var(--footer-bg); color: var(--footer-text); padding: 2rem 0; text-align: center; }
+.footer .container { max-width: 1140px; margin: 0 auto; padding: 0 20px; }
+
+/* 动画 (保持不变) */
+@keyframes fade-in-up { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
+.hero-text-column h1, .hero-text-column .hero-subtitle, .hero-text-column .search-container { opacity: 0; animation: fade-in-up 0.8s ease-out forwards; }
+.hero-text-column .hero-subtitle { animation-delay: 0.2s; }
+.hero-text-column .search-container { animation-delay: 0.4s; }
 
 
-/* --- 非首页的常规页面内容样式 --- */
-.page-content {
-    max-width: 800px;
-    margin: 4rem auto;
-    padding: 2rem;
+/* --- 3. 新增主题切换按钮的样式 --- */
+#theme-toggle {
+    background: none;
+    border: none;
+    cursor: pointer;
+    padding: 5px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 50%;
+}
+#theme-toggle svg {
+    transition: transform 0.3s ease;
+}
+#theme-toggle:hover svg {
+    transform: scale(1.1) rotate(15deg);
 }
 
-/* --- 响应式设计 --- */
-@media (max-width: 900px) {
-    .hero-section {
-        flex-direction: column; /* 垂直堆叠 */
-    }
-    .hero-image-column {
-        min-height: 40vh; /* 在移动端给图片一个固定高度 */
-        width: 100%;
-        flex-basis: auto;
-    }
-    .hero-text-column {
-        width: 100%;
-        flex-basis: auto;
-        align-items: center; /* 居中对齐 */
-        text-align: center;
-    }
-    .header-nav {
-        display: none; /* 在移动端可以先简单隐藏导航 */
-    }
-    .header-container {
-        justify-content: center; /* Logo居中 */
-    }
+/* --- 强制布局调整 --- */
+
+/* 1. 强制隐藏网站标题 */
+.header-brand {
+    display: none !important; /* 使用 !important 确保它一定会被隐藏 */
 }
-  /* --- 搜索框增强样式 --- */
-    .bing-search-form {
-        position: relative; /* 这是为了让内部的切换按钮可以精确定位 */
-    }
 
-    #search-engine-switch {
-        position: absolute;
-        left: 0;
-        top: 0;
-        height: 100%;
-        width: 50px; /* 给按钮一个固定宽度 */
-        background: transparent;
-        border: none;
-        cursor: pointer;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        border-radius: 50px 0 0 50px; /* 左侧圆角 */
-        transition: background-color 0.2s;
-    }
-
-    #search-engine-switch:hover {
-        background-color: rgba(0, 0, 0, 0.1); /* 悬停时轻微变暗 */
-    }
-
-    /* 隐藏图标的辅助类 */
-    .hidden {
-        display: none;
-    }
-
-    /* 关键：给输入框的左侧留出空间，防止文字和图标重叠 */
-    .bing-search-form input[type="text"] {
-        padding-left: 55px; /* 左内边距 > 切换按钮的宽度 */
-    }
-```
+/* 2. 让右侧的控件组作为唯一的 flex 子元素，并把它推到最右边 */
+.header-container {
+    justify-content: flex-end; /* 强制让所有内容靠右 */
+}
