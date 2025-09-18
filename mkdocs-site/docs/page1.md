@@ -236,3 +236,7 @@
 •[清代缙绅录量化数据库](http://vis.cse.ust.hk/searchjsl/)
 
 •[中国历代人物传记资料库](http://db1.ihp.sinica.edu.tw/cbdbc/ttsweb?@0:0:1:cbdbkm@@0.8933508103192395)
+
+
+
+springerlink
