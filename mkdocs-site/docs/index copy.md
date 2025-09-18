@@ -9,6 +9,9 @@ For full documentation visit [mkdocs.org](https://www.mkdocs.org).
 * `mkdocs build` - Build the documentation site.
 * `mkdocs -h` - Print help message and exit.
 * `mkdocs gh-deploy --force` - Upload.
+* ` git add .
+    git commit -m "更新首页格言"
+    git push origin main
 
 <form method="get" action="https://www.bing.com/search" target="_blank">
     <input type="text" name="q" placeholder="在必应上搜索...">

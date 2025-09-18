@@ -170,4 +170,38 @@ html, body {
         justify-content: center; /* Logo居中 */
     }
 }
+  /* --- 搜索框增强样式 --- */
+    .bing-search-form {
+        position: relative; /* 这是为了让内部的切换按钮可以精确定位 */
+    }
+
+    #search-engine-switch {
+        position: absolute;
+        left: 0;
+        top: 0;
+        height: 100%;
+        width: 50px; /* 给按钮一个固定宽度 */
+        background: transparent;
+        border: none;
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        border-radius: 50px 0 0 50px; /* 左侧圆角 */
+        transition: background-color 0.2s;
+    }
+
+    #search-engine-switch:hover {
+        background-color: rgba(0, 0, 0, 0.1); /* 悬停时轻微变暗 */
+    }
+
+    /* 隐藏图标的辅助类 */
+    .hidden {
+        display: none;
+    }
+
+    /* 关键：给输入框的左侧留出空间，防止文字和图标重叠 */
+    .bing-search-form input[type="text"] {
+        padding-left: 55px; /* 左内边距 > 切换按钮的宽度 */
+    }
 ```

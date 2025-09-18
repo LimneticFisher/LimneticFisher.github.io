@@ -1,33 +1,40 @@
-name: ci
+name: Deploy MkDocs Site to GitHub Pages
+
+# 触发条件：当有代码 push 到 main 分支时自动运行
 on:
   push:
     branches:
-      - master
       - main
+      - master # 同时兼容 main 和 master 作为主分支
+
+# 授予工作流将代码部署到 gh-pages 分支的权限
 permissions:
   contents: write
+      
+# 定义一个名为 "deploy" 的任务
 jobs:
   deploy:
+    # 指定运行环境为最新的 Ubuntu 系统
     runs-on: ubuntu-latest
-    if: github.event.repository.fork == false
+    
+    # 定义任务的步骤
     steps:
-      - uses: actions/checkout@v4
-      - name: Configure Git Credentials
-        run: |
-          git config user.name github-actions[bot]
-          git config user.email 41898282+github-actions[bot]@users.noreply.github.com
-      - uses: actions/setup-python@v5
+      # 第一步：检出（下载）你的仓库代码到服务器
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      # 第二步：设置 Python 3.x 环境
+      - name: Set up Python
+        uses: actions/setup-python@v5
         with:
           python-version: 3.x
-      - run: echo "cache_id=$(date --utc '+%V')" >> $GITHUB_ENV
-      - uses: actions/cache@v4
-        with:
-          key: mkdocs-material-${{ env.cache_id }}
-          path: .cache
-          restore-keys: |
-            mkdocs-material-
-      - run: apt-get install pngquant 
-      - run: pip install git+https://${GH_TOKEN}@github.com/squidfunk/mkdocs-material-insiders.git
-      - run: mkdocs gh-deploy --force
-env:
-  GH_TOKEN: ${{ secrets.GH_TOKEN }}
+
+      # 第三步：安装 MkDocs
+      # 这是唯一需要的 Python 依赖，因为你不使用任何外部主题或插件
+      - name: Install MkDocs
+        run: pip install mkdocs
+
+      # 第四步：构建和部署网站
+      # 使用 mkdocs gh-deploy 命令，它会自动处理构建和推送到 gh-pages 分支的所有事宜
+      - name: Build and Deploy
+        run: mkdocs gh-deploy --force --clean
