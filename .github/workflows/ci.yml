@@ -37,4 +37,6 @@ jobs:
       # 第四步：构建和部署网站
       # 使用 mkdocs gh-deploy 命令，它会自动处理构建和推送到 gh-pages 分支的所有事宜
       - name: Build and Deploy
+      # 请把 'mkdocs-site' 换成您自己的子文件夹名
+        working-directory: ./mkdocs-site 
         run: mkdocs gh-deploy --force --clean
