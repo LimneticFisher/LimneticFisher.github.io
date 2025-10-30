@@ -1,4 +1,11 @@
-/* --- 1. 定义颜色变量 --- */
+/* custom_theme/css/style.css (最终版，保留原始注释) */
+
+/* --- 1. 引入字体 --- */
+/* 【【修改点 1】】: 在这里同时引入了“思源黑体”和“思源宋体” */
+@import url('https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@400;700&family=Noto+Serif+SC:wght@700&display=swap');
+
+
+/* --- 1. 定义颜色变量 --- */ /* (您的原始注释) */
 :root {
     /* 日间模式颜色 (默认) */
     --bg-primary: #9d3c47;       /* 主背景色 (棕红色) */
@@ -34,7 +41,7 @@ html.dark-mode {
 }
 
 
-/* --- 2. 重构现有样式，使用变量 --- */
+/* --- 2. 重构现有样式，使用变量 --- */ /* (您的原始注释) */
 html, body {
     margin: 0; padding: 0;
     font-family: 'Noto Sans SC', sans-serif;
@@ -74,7 +81,7 @@ html, body {
     background-color: var(--bg-secondary); /* 使用变量 */
 }
 .image-zoom-container { position: absolute; top: 0; left: 0; width: 100%; height: 100%; overflow: hidden; }
-.image-zoom-container img { width: 100%; height: 100%; object-fit: cover; transition: transform 3.0s ease-out, opacity 3.0s ease-in-out; }
+.image-zoom-container img { width: 100%; height: 100%; object-fit: cover; transition: transform 1.5s ease-out, opacity 1.5s ease-in-out; }
 .image-zoom-container:hover img { transform: scale(1.05); }
 
 .hero-text-column {
@@ -85,7 +92,18 @@ html, body {
     color: var(--text-primary); /* 使用变量 */
     transition: background-color 0.3s ease; /* 添加平滑过渡效果 */
 }
-.hero-text-column h1 { font-size: 4.5rem; font-weight: bold; line-height: 1.2; margin: 0 0 1rem 0; color: var(--text-hero); letter-spacing: 10px;}
+
+/* 【【修改点 2】】: 在这里为 h1 单独指定了“思源宋体” */
+.hero-text-column h1 { 
+    font-size: 4.5rem; 
+    font-weight: bold; 
+    line-height: 1.2; 
+    margin: 0 0 1rem 0; 
+    color: var(--text-hero); 
+    letter-spacing: 20px;
+    font-family: 'Noto Serif SC', serif; /* 应用思源宋体 */
+}
+
 .hero-subtitle { font-size: 1.25rem; margin-bottom: 2.5rem; color: var(--text-secondary); max-width: 500px; }
 
 .search-container { width: 100%; max-width: 450px; }
@@ -101,14 +119,14 @@ html, body {
 .footer { background-color: var(--footer-bg); color: var(--footer-text); padding: 2rem 0; text-align: center; }
 .footer .container { max-width: 1140px; margin: 0 auto; padding: 0 20px; }
 
-/* 动画 (保持不变) */
+/* 动画 (保持不变) */ /* (您的原始注释) */
 @keyframes fade-in-up { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
 .hero-text-column h1, .hero-text-column .hero-subtitle, .hero-text-column .search-container { opacity: 0; animation: fade-in-up 0.8s ease-out forwards; }
 .hero-text-column .hero-subtitle { animation-delay: 0.2s; }
 .hero-text-column .search-container { animation-delay: 0.4s; }
 
 
-/* --- 3. 新增主题切换按钮的样式 --- */
+/* --- 3. 新增主题切换按钮的样式 --- */ /* (您的原始注释) */
 #theme-toggle {
     background: none;
     border: none;
@@ -126,7 +144,7 @@ html, body {
     transform: scale(1.1) rotate(15deg);
 }
 
-/* --- 强制布局调整 --- */
+/* --- 强制布局调整 --- */ /* (您的原始注释) */
 
 /* 1. 强制隐藏网站标题 */
 .header-brand {
