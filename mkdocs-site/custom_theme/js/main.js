@@ -28,12 +28,24 @@ function initSearchWidget() {
 }
 
 // ⬇️⬇️ 新增函数：初始化主题切换功能 ⬇️⬇️
+// custom_theme/js/main.js
+
+// ⬇️⬇️ 用这个新版本，替换掉你原来的 initThemeToggle 函数 ⬇️⬇️
 function initThemeToggle() {
     const themeToggleButton = document.getElementById('theme-toggle');
     const sunIcon = document.getElementById('icon-sun');
     const moonIcon = document.getElementById('icon-moon');
+    // 【第1处修改】新增：获取我们在 index.md 里添加了 id 的那张图片
+    const heroImage = document.getElementById('hero-image');
     
     if (!themeToggleButton || !sunIcon || !moonIcon) return;
+
+    // 【第2处修改】新增：定义日间和夜间模式对应的图片路径
+    // 【【【重要：请确保这里的路径和您存放图片的位置完全一致！】】】
+    const themeImages = {
+        light: 'images/light.webp',
+        dark: 'images/dark.webp'
+    };
 
     // 函数：根据当前主题模式更新UI
     function applyTheme(theme) {
@@ -41,10 +53,18 @@ function initThemeToggle() {
             document.documentElement.classList.add('dark-mode');
             sunIcon.classList.add('hidden');
             moonIcon.classList.remove('hidden');
+            // 【第3处修改】新增：如果页面上有这张图片，就把它切换成夜间模式的图片
+            if (heroImage) {
+                heroImage.src = themeImages.dark;
+            }
         } else {
             document.documentElement.classList.remove('dark-mode');
             sunIcon.classList.remove('hidden');
             moonIcon.classList.add('hidden');
+            // 【第4处修改】新增：如果页面上有这张图片，就把它切换成日间模式的图片
+            if (heroImage) {
+                heroImage.src = themeImages.light;
+            }
         }
     }
 

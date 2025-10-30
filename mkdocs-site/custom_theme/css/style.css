@@ -74,7 +74,7 @@ html, body {
     background-color: var(--bg-secondary); /* 使用变量 */
 }
 .image-zoom-container { position: absolute; top: 0; left: 0; width: 100%; height: 100%; overflow: hidden; }
-.image-zoom-container img { width: 100%; height: 100%; object-fit: cover; transition: transform 0.4s ease-out; }
+.image-zoom-container img { width: 100%; height: 100%; object-fit: cover; transition: transform 3.0s ease-out, opacity 3.0s ease-in-out; }
 .image-zoom-container:hover img { transform: scale(1.05); }
 
 .hero-text-column {
@@ -85,7 +85,7 @@ html, body {
     color: var(--text-primary); /* 使用变量 */
     transition: background-color 0.3s ease; /* 添加平滑过渡效果 */
 }
-.hero-text-column h1 { font-size: 4.5rem; font-weight: bold; line-height: 1.2; margin: 0 0 1rem 0; color: var(--text-hero); }
+.hero-text-column h1 { font-size: 4.5rem; font-weight: bold; line-height: 1.2; margin: 0 0 1rem 0; color: var(--text-hero); letter-spacing: 10px;}
 .hero-subtitle { font-size: 1.25rem; margin-bottom: 2.5rem; color: var(--text-secondary); max-width: 500px; }
 
 .search-container { width: 100%; max-width: 450px; }

@@ -4,7 +4,7 @@
     <div class="hero-image-column">
         <div class="image-zoom-container">
             <!-- 请将下面的 src 替换为你自己的图片链接 -->
-            <img src="images/09金陵各營屢捷解圍圖.webp" alt="个人主页图片">
+            <img id="hero-image" src="images/light.webp" alt="个人主页图片">
         </div>
     </div>
 
