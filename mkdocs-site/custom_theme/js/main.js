@@ -1,7 +1,8 @@
-// 函数：初始化搜索引擎切换功能
+// custom_theme/js/main.js
+
+// 1. 初始化搜索引擎切换功能
 function initSearchWidget() {
     const searchForm = document.getElementById('search-form');
-    // ... (这部分代码保持和之前一样)
     if (!searchForm) return;
 
     const switchButton = document.getElementById('search-engine-switch');
@@ -27,24 +28,22 @@ function initSearchWidget() {
     });
 }
 
-// ⬇️⬇️ 新增函数：初始化主题切换功能 ⬇️⬇️
-// custom_theme/js/main.js
-
-// ⬇️⬇️ 用这个新版本，替换掉你原来的 initThemeToggle 函数 ⬇️⬇️
+// 2. 初始化主题切换功能
 function initThemeToggle() {
     const themeToggleButton = document.getElementById('theme-toggle');
     const sunIcon = document.getElementById('icon-sun');
     const moonIcon = document.getElementById('icon-moon');
-    // 【第1处修改】新增：获取我们在 index.md 里添加了 id 的那张图片
-    const heroImage = document.getElementById('hero-image');
+    const heroImage = document.getElementById('hero-image'); // 获取首页大图
     
     if (!themeToggleButton || !sunIcon || !moonIcon) return;
 
-    // 【第2处修改】新增：定义日间和夜间模式对应的图片路径
-    // 【【【重要：请确保这里的路径和您存放图片的位置完全一致！】】】
+    // 【关键修改】获取 HTML 中定义的 base_url，如果没定义则默认为当前目录
+    // 这样在 resources 子页面也能找到图片
+    const baseUrl = (typeof base_url !== 'undefined') ? base_url : '.';
+    
     const themeImages = {
-        light: 'images/light.webp',
-        dark: 'images/dark.webp'
+        light: `${baseUrl}/images/light.webp`,
+        dark: `${baseUrl}/images/dark.webp`
     };
 
     // 函数：根据当前主题模式更新UI
@@ -53,45 +52,56 @@ function initThemeToggle() {
             document.documentElement.classList.add('dark-mode');
             sunIcon.classList.add('hidden');
             moonIcon.classList.remove('hidden');
-            // 【第3处修改】新增：如果页面上有这张图片，就把它切换成夜间模式的图片
-            if (heroImage) {
-                heroImage.src = themeImages.dark;
-            }
+            if (heroImage) heroImage.src = themeImages.dark;
         } else {
             document.documentElement.classList.remove('dark-mode');
             sunIcon.classList.remove('hidden');
             moonIcon.classList.add('hidden');
-            // 【第4处修改】新增：如果页面上有这张图片，就把它切换成日间模式的图片
-            if (heroImage) {
-                heroImage.src = themeImages.light;
-            }
+            if (heroImage) heroImage.src = themeImages.light;
         }
     }
 
-    // 页面加载时，检查 localStorage 中是否已存有主题偏好
     const savedTheme = localStorage.getItem('theme') || 'light';
     applyTheme(savedTheme);
 
-    // 当按钮被点击时
     themeToggleButton.addEventListener('click', () => {
-        // 检查当前是否为暗黑模式
         const isDarkMode = document.documentElement.classList.contains('dark-mode');
         const newTheme = isDarkMode ? 'light' : 'dark';
-
-        // 应用新主题并保存到 localStorage
         applyTheme(newTheme);
         localStorage.setItem('theme', newTheme);
     });
 }
 
+// 3. 【新增】瀑布流动画 (用于资源页卡片浮现)
+function initScrollAnimation() {
+    const elements = document.querySelectorAll('.scroll-animate');
+    if (elements.length === 0) return; // 如果页面没这元素就不跑
 
-// 确保在整个页面的所有内容都加载完毕后，再来执行我们的初始化函数
+    const observer = new IntersectionObserver((entries) => {
+        entries.forEach((entry) => {
+            if (entry.isIntersecting) {
+                // 只有定义了 @keyframes blur-in-up (在CSS里) 才会动
+                entry.target.style.animation = `blur-in-up 0.8s cubic-bezier(0.16, 1, 0.3, 1) forwards`;
+                observer.unobserve(entry.target);
+            }
+        });
+    }, { threshold: 0.1 });
+
+    elements.forEach((el, index) => {
+        observer.observe(el);
+        el.style.animationDelay = `${(index % 5) * 0.05}s`; 
+    });
+}
+
+// 4. 执行初始化
 if (document.readyState === 'complete') {
     initSearchWidget();
-    initThemeToggle(); // 运行新的主题切换函数
+    initThemeToggle();
+    initScrollAnimation();
 } else {
     window.addEventListener('load', () => {
         initSearchWidget();
-        initThemeToggle(); // 运行新的主题切换函数
+        initThemeToggle();
+        initScrollAnimation();
     });
 }
