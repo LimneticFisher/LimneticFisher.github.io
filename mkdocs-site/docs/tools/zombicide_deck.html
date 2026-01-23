@@ -1,0 +1,617 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Zombicide Pro Deck</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Serif+SC:ital,wght@1,700&family=Permanent+Marker&family=ZCOOL+QingKe+HuangYou&display=swap" rel="stylesheet">
+    
+    <style>
+        :root {
+            --card-width: 44vh;
+            --card-height: 62vh;
+            
+            --hazard-yellow: #f1c40f;
+            --hazard-black: #111;
+            --bg-dark: #050505;
+            --stripe-pattern: repeating-linear-gradient(
+                45deg,
+                var(--hazard-yellow),
+                var(--hazard-yellow) 15px,
+                var(--hazard-black) 15px,
+                var(--hazard-black) 30px
+            );
+
+            --color-common: #dcdde1;
+            --color-rare: #00a8ff;
+            --color-epic: #9c88ff;
+            --color-legendary: #ffbe76;
+            --color-golden: #fbc531;
+        }
+
+        body {
+            background-color: var(--bg-dark);
+            background-image: radial-gradient(circle at center, #1e1e1e 0%, #000 80%);
+            font-family: 'ZCOOL QingKe HuangYou', sans-serif;
+            margin: 0; padding: 0;
+            height: 100vh; width: 100vw;
+            overflow: hidden;
+            display: flex; flex-direction: column;
+        }
+
+        /* 顶部底部条 */
+        .hazard-bar {
+            height: 40px; width: 100%;
+            background: var(--stripe-pattern);
+            box-shadow: 0 0 20px rgba(0,0,0,0.8);
+            z-index: 100;
+        }
+        .hazard-bar.top { border-bottom: 5px solid #000; }
+        .hazard-bar.bottom { border-top: 5px solid #000; }
+
+        /* 舞台 */
+        .stage-center {
+            flex: 1;
+            display: flex; align-items: center; justify-content: center;
+            perspective: 1500px; position: relative;
+        }
+
+        /* 光爆层 */
+        .burst-layer {
+            position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%);
+            width: 100%; height: 100%; pointer-events: none; z-index: 0;
+            display: flex; align-items: center; justify-content: center; overflow: hidden;
+        }
+        .burst-core {
+            position: absolute; width: 0; height: 0; border-radius: 50%;
+            background: radial-gradient(circle, #fff 0%, var(--rarity-color) 60%, transparent 100%);
+            opacity: 0; mix-blend-mode: screen; filter: blur(20px);
+        }
+        .burst-glow {
+            position: absolute; width: 0; height: 0; border-radius: 50%;
+            background: var(--rarity-color); opacity: 0; filter: blur(80px); mix-blend-mode: screen;
+        }
+        .burst-ring {
+            position: absolute; width: 0; height: 0; border-radius: 50%;
+            border: 4px solid #fff; box-shadow: 0 0 30px var(--rarity-color); opacity: 0;
+        }
+        .burst-layer.active .burst-core { animation: anim-core 0.8s cubic-bezier(0.1, 0.9, 0.2, 1) forwards; }
+        .burst-layer.active .burst-glow { animation: anim-glow 1.2s ease-out forwards; }
+        .burst-layer.active .burst-ring { animation: anim-ring 0.6s cubic-bezier(0, 0.9, 0.57, 1) forwards; }
+        @keyframes anim-core { 0% { width: 0; height: 0; opacity: 1; } 30% { opacity: 1; } 100% { width: 150vh; height: 150vh; opacity: 0; } }
+        @keyframes anim-glow { 0% { width: 0; height: 0; opacity: 0.8; } 100% { width: 200vw; height: 200vw; opacity: 0; } }
+        @keyframes anim-ring { 0% { width: 0; height: 0; opacity: 0; border-width: 20px; } 10% { opacity: 1; } 100% { width: 140vh; height: 140vh; opacity: 0; border-width: 0px; } }
+
+        /* 交互容器 */
+        .interaction-container {
+            display: flex; align-items: center; justify-content: center;
+            width: var(--card-width); height: var(--card-height);
+            transition: all 0.6s cubic-bezier(0.23, 1, 0.32, 1);
+            position: relative; z-index: 10;
+        }
+        /* 当牌翻开时，宽度变宽以容纳信息栏 */
+        .interaction-container.active:hover { width: calc(var(--card-width) + 420px); }
+        .scene {
+            width: var(--card-width); height: var(--card-height);
+            position: relative; transition: transform 0.6s cubic-bezier(0.23, 1, 0.32, 1);
+        }
+        .interaction-container.active:hover .scene { transform: rotate(-3deg) translateX(-60px) scale(1.1); }
+
+        /* 卡牌 */
+        .card {
+            width: 100%; height: 100%; position: relative;
+            transition: transform 0.6s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+            transform-style: preserve-3d; cursor: pointer; border-radius: 20px;
+        }
+        .card.is-flipped { transform: rotateY(180deg); }
+        
+        /* 牌堆耗尽状态 */
+        .card.is-empty { cursor: not-allowed; filter: grayscale(100%); opacity: 0.7; }
+        
+        /* 卡背流光 */
+        .card:not(.is-empty)::before {
+            content: ''; position: absolute; top: -20px; left: -20px; right: -20px; bottom: -20px;
+            background: var(--rarity-color); z-index: -1; filter: blur(30px); opacity: 0;
+            transition: opacity 0.5s ease; border-radius: 40px;
+        }
+        .card:not(.is-flipped):not(.is-empty):hover::before { opacity: 0.4; }
+        
+        /* 变量绑定 */
+        .card[data-rarity="common"] { --rarity-color: var(--color-common); }
+        .card[data-rarity="rare"] { --rarity-color: var(--color-rare); }
+        .card[data-rarity="epic"] { --rarity-color: var(--color-epic); }
+        .card[data-rarity="legendary"] { --rarity-color: var(--color-legendary); }
+        .card[data-rarity="golden"] { --rarity-color: var(--color-golden); }
+        .card[data-rarity="empty"] { --rarity-color: #555; } /* 空牌堆颜色 */
+
+        .card__face {
+            position: absolute; width: 100%; height: 100%;
+            -webkit-backface-visibility: hidden; backface-visibility: hidden;
+            border-radius: 20px; overflow: hidden;
+            border: 5px solid #000; background-color: #000;
+            box-shadow: inset 0 0 30px rgba(0,0,0,0.8); 
+        }
+        .card__face--front { 
+            background-color: #8E2F39; 
+            background-image: url('../images/card_back.png'); 
+            background-size: cover; background-position: center; 
+            display: flex; align-items: center; justify-content: center;
+        }
+        /* 空牌堆提示字 */
+        .empty-msg {
+            display: none; font-size: 2rem; color: #fff; text-shadow: 0 0 10px #000;
+            transform: rotate(-15deg); border: 4px solid #fff; padding: 10px 20px;
+        }
+        .card.is-empty .empty-msg { display: block; }
+
+        .card__face--back { transform: rotateY(180deg); display: flex; align-items: center; justify-content: center; position: relative; }
+
+        .sheen-overlay {
+            position: absolute; top: 0; left: -150%; width: 100%; height: 100%;
+            background: linear-gradient(to right, transparent 0%, rgba(255,255,255,0.4) 50%, transparent 100%);
+            transform: skewX(-25deg); pointer-events: none; z-index: 20; mix-blend-mode: overlay;
+        }
+        .card.is-flipped .sheen-overlay { animation: sheen-anim 0.8s ease-out 0.2s; }
+        @keyframes sheen-anim { 0% { left: -150%; opacity: 0; } 50% { opacity: 1; } 100% { left: 150%; opacity: 0; } }
+
+        .hazard-border-overlay {
+            position: absolute; top: 0; left: 0; right: 0; bottom: 0; z-index: 10;
+            background: var(--stripe-pattern);
+            -webkit-mask: linear-gradient(#fff, #fff) content-box, linear-gradient(#fff, #fff);
+            -webkit-mask-composite: xor; mask-composite: exclude;
+            padding: 15px; pointer-events: none;
+        }
+        .card-image-full { width: 100%; height: 100%; object-fit: cover; }
+
+        /* === 信息栏 === */
+        .info-panel {
+            width: 360px; margin-left: -360px; opacity: 0;
+            transform: translateX(50px) translateZ(-100px);
+            display: flex; flex-direction: column; gap: 30px;
+            z-index: 1; transition: all 0.6s cubic-bezier(0.23, 1, 0.32, 1);
+            pointer-events: none;
+        }
+        .interaction-container.active:hover .info-panel { margin-left: 60px; opacity: 1; transform: translateX(0) translateZ(0); pointer-events: auto; }
+        .info-box {
+            position: relative; background: rgba(0,0,0,0.9); padding: 20px 25px;
+            color: var(--hazard-yellow); text-align: center;
+            border: 4px solid transparent; background-clip: padding-box;
+            box-shadow: 0 15px 40px rgba(0,0,0,0.6);
+        }
+        .info-box::before {
+            content: ''; position: absolute; top: -4px; bottom: -4px; left: -4px; right: -4px;
+            background: var(--stripe-pattern); z-index: -1; border-radius: 6px;
+        }
+        .info-title-box { display: flex; justify-content: center; align-items: center; min-height: 70px; position: relative; overflow: visible; }
+        .info-name { font-family: 'ZCOOL QingKe HuangYou', sans-serif; font-size: 3rem; letter-spacing: 4px; text-shadow: 4px 4px 0 #000; }
+        .hp-badge {
+            position: absolute; top: -50px; right: -30px;
+            font-family: 'Permanent Marker', cursive; font-size: 6rem;
+            color: #000; -webkit-text-stroke: 4px var(--hazard-yellow);
+            filter: drop-shadow(5px 5px 0px rgba(0,0,0,0.6)); transform: rotate(15deg); z-index: 10; pointer-events: none;
+        }
+        .info-desc-box { text-align: left; font-size: 1.4rem; line-height: 1.6; text-shadow: 2px 2px 0 #000; font-family: 'ZCOOL QingKe HuangYou', sans-serif; }
+        .type-tag { display: inline-block; background: var(--hazard-yellow); color: #000; font-family: 'ZCOOL QingKe HuangYou', sans-serif; padding: 6px 14px; border-radius: 6px; margin-bottom: 15px; font-size: 1.2rem; letter-spacing: 2px; box-shadow: 3px 3px 0 rgba(0,0,0,0.5); transform: rotate(-2deg); text-shadow: none; }
+        
+        .info-flavor-box {
+            font-family: 'Noto Serif SC', serif; font-style: italic; font-weight: 700;
+            font-size: 1.1rem; color: #eee; text-align: left; line-height: 1.7;
+            min-height: 80px; display: flex; flex-direction: column; justify-content: space-between;
+        }
+        .flavor-text { margin-bottom: 10px; opacity: 0.95; text-shadow: 1px 1px 0 #000; }
+        
+        /* 底部操作区 (返回 + 计数) */
+        .card-actions {
+            display: flex; align-items: center; justify-content: center; gap: 15px;
+            padding-top: 10px; border-top: 2px dashed rgba(255,255,255,0.2);
+        }
+        .return-btn { cursor: pointer; font-size: 2.5rem; color: var(--hazard-yellow); transition: transform 0.2s; }
+        .return-btn:hover { transform: scale(1.2) rotate(-20deg); color: #fff; }
+        
+        .deck-counter {
+            font-family: 'Permanent Marker', cursive; font-size: 1.5rem; color: #fff;
+            background: #000; padding: 2px 8px; border-radius: 4px; border: 1px solid var(--hazard-yellow);
+            transform: rotate(5deg);
+        }
+
+        /* === 按钮组件 === */
+        .action-btn {
+            background: #000; color: var(--hazard-yellow); border: 2px solid var(--hazard-yellow);
+            padding: 10px; border-radius: 50%; cursor: pointer; opacity: 0.6; transition: all 0.3s;
+            display: flex; align-items: center; justify-content: center;
+        }
+        .action-btn:hover { opacity: 1; transform: scale(1.1); box-shadow: 0 0 15px var(--hazard-yellow); }
+        .action-btn svg { width: 24px; height: 24px; display: block; }
+
+        .sound-toggle { position: fixed; bottom: 50px; left: 20px; z-index: 200; }
+        .sound-off-icon { display: none; }
+        .sound-toggle.muted .sound-on-icon { display: none; }
+        .sound-toggle.muted .sound-off-icon { display: block; }
+
+        /* === 🆕 洗牌按钮 (居中显示在卡牌下方) === */
+        .reshuffle-container {
+            position: absolute; top: 110%; left: 50%; transform: translateX(-50%);
+            z-index: 20; opacity: 0; pointer-events: none; transition: opacity 0.3s;
+        }
+        /* 仅在未翻开且牌堆不为空时显示，或者牌堆空时显示 */
+        .interaction-container:not(.active) .reshuffle-container { opacity: 1; pointer-events: auto; }
+        
+        .reshuffle-btn {
+            background: var(--hazard-yellow); color: #000; border: none;
+            font-family: 'ZCOOL QingKe HuangYou', sans-serif; font-size: 1.5rem;
+            padding: 8px 25px; clip-path: polygon(10% 0, 100% 0, 90% 100%, 0% 100%);
+            cursor: pointer; box-shadow: 0 5px 15px rgba(0,0,0,0.5);
+            transition: transform 0.2s;
+        }
+        .reshuffle-btn:hover { transform: scale(1.1); color: #fff; background: #d35400; }
+        .reshuffle-btn:active { transform: scale(0.95); }
+
+        /* === 扩展包过滤器 === */
+        .filter-wrapper {
+            position: fixed; bottom: 50px; right: 20px; z-index: 300;
+            display: flex; flex-direction: column; align-items: flex-end;
+        }
+        .filter-icon {
+            width: auto; height: auto; max-width: 100px; max-height: 100px;
+            cursor: pointer; filter: drop-shadow(0 4px 6px rgba(0,0,0,0.5));
+            transition: transform 0.3s;
+        }
+        .filter-wrapper:hover .filter-icon { transform: scale(1.1) rotate(-10deg); }
+        .filter-menu {
+            position: absolute; bottom: 85px; right: 0; width: 200px;
+            background: rgba(0,0,0,0.95); border: 3px solid var(--hazard-yellow);
+            padding: 15px; box-shadow: 0 10px 30px rgba(0,0,0,0.8);
+            opacity: 0; visibility: hidden; transform: translateY(20px) scale(0.9);
+            transition: all 0.3s;
+            background-image: repeating-linear-gradient(45deg, rgba(241,196,15,0.05) 0, rgba(241,196,15,0.05) 10px, transparent 10px, transparent 20px);
+        }
+        .filter-wrapper:hover .filter-menu { opacity: 1; visibility: visible; transform: translateY(0) scale(1); }
+        .menu-title {
+            color: var(--hazard-yellow); font-size: 1.2rem; margin-bottom: 10px;
+            border-bottom: 2px dashed rgba(241, 196, 15, 0.3); padding-bottom: 5px; text-align: center;
+        }
+        .filter-item { display: flex; align-items: center; margin-bottom: 8px; cursor: pointer; color: #fff; font-size: 1rem; transition: color 0.2s; }
+        .filter-item:hover { color: var(--hazard-yellow); }
+        .filter-checkbox {
+            appearance: none; -webkit-appearance: none; width: 18px; height: 18px;
+            border: 2px solid var(--hazard-yellow); background: transparent; margin-right: 10px; position: relative; cursor: pointer;
+        }
+        .filter-checkbox:checked { background: var(--hazard-yellow); }
+        .filter-checkbox:checked::after { content: '✔'; position: absolute; color: #000; font-size: 14px; font-weight: bold; top: -2px; left: 2px; }
+
+    </style>
+</head>
+<body>
+
+    <div class="hazard-bar top"></div>
+
+    <div class="stage-center">
+        <div class="burst-layer" id="burstLayer">
+            <div class="burst-glow"></div>
+            <div class="burst-core"></div>
+            <div class="burst-ring"></div>
+        </div>
+
+        <div class="interaction-container" id="interactionWrapper">
+            <div class="scene">
+                <div class="reshuffle-container">
+                    <button class="reshuffle-btn" id="mainReshuffleBtn">🔄 重置牌堆</button>
+                </div>
+
+                <div class="card" id="gameCard" data-rarity="common">
+                    <div class="card__face card__face--front">
+                        <div class="empty-msg">牌堆耗尽<br>请洗牌</div>
+                    </div>
+                    <div class="card__face card__face--back">
+                        <div class="hazard-border-overlay"></div>
+                        <div class="sheen-overlay"></div>
+                        <img id="cardImage" class="card-image-full" src="" alt="Abomination">
+                    </div>
+                </div>
+            </div>
+
+            <div class="info-panel">
+                <div class="info-box info-title-box">
+                    <div class="info-name" id="infoName">LOADING</div>
+                    <div class="hp-badge" id="infoHp">3</div>
+                </div>
+                <div class="info-box info-desc-box">
+                    <div id="infoType" class="type-tag">TYPE</div>
+                    <div id="infoAbility">Ability text...</div>
+                </div>
+                <div class="info-box info-flavor-box">
+                    <div class="flavor-text" id="infoFlavor">"Flavor text..."</div>
+                    
+                    <div class="card-actions">
+                        <div class="return-btn" id="returnBtn" title="返回牌库">↩</div>
+                        <div class="deck-counter" id="deckCounter">0/0</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="sound-toggle action-btn" id="soundToggle" title="开关语音">
+        <svg class="sound-on-icon" viewBox="0 0 24 24" fill="currentColor"><path d="M14 3.23v2.06c2.89.86 5 3.54 5 6.71s-2.11 5.85-5 6.71v2.06c4.01-.91 7-4.49 7-8.77s-2.99-7.86-7-8.77zm-4 0h-2.59l-5 5H1v6h1.41l5 5H10v-16z"/></svg>
+        <svg class="sound-off-icon" viewBox="0 0 24 24" fill="currentColor"><path d="M16.5 12c0-1.77-1.02-3.29-2.5-4.03v2.21l2.45 2.45c.03-.2.05-.41.05-.63zm2.5 0c0 .94-.2 1.82-.54 2.64l1.51 1.51C20.63 14.91 21 13.5 21 12c0-4.28-2.99-7.86-7-8.77v2.06c2.89.86 5 3.54 5 6.71zM4.27 3L3 4.27 7.73 9H3v6h4l5 5v-6.73l4.25 4.25c-.67.52-1.42.93-2.25 1.18v2.06c1.38-.31 2.63-.95 3.69-1.81L19.73 21 21 19.73l-9-9L4.27 3zM12 4L9.91 6.09 12 8.18V4z"/></svg>
+    </div>
+
+    <div class="filter-wrapper">
+        <div class="filter-menu" id="filterMenu">
+            <div class="menu-title">选择扩展包</div>
+        </div>
+        <img src="../images/logo.png" class="filter-icon" alt="Expansion Filter">
+    </div>
+
+    <div class="hazard-bar bottom"></div>
+
+    <script>
+        // ===============================================
+        // 🛠️ 数据录入区
+        // ===============================================
+        const deckData = [
+            { 
+                name: "流浪者", hp: "3", type: "憎恶", expansion: "基础",
+                image: "../images/Abomination-3.webp", 
+                ability: "在流浪者所在区域的幸存者无法执行战斗动作。", 
+                flavor: "“流浪者在各方面都极其恶心，站在它旁边简直让人无法忍受。”" 
+            },
+            { 
+                name: "零号病人", hp: "3", type: "憎恶", expansion: "基础",
+                image: "../images/Abomination-4.webp", 
+                ability: "无特殊规则。", 
+                flavor: "“真的是第一个丧尸吗？没人能说出来。这它确实把医院变成了感染的噩梦。”" 
+            },
+            { 
+                name: "警员", hp: "3", type: "憎恶", expansion: "基础",
+                image: "../images/Abomination-1.webp", 
+                ability: "被攻击时，警员作为其所在区域的优先目标。", 
+                flavor: "“它想必扮演过好几次坏警察。”" 
+            },
+            { 
+                name: "外星人", hp: "3", type: "憎恶", expansion: "都市传说",
+                image: "../images/Abductor.webp", 
+                ability: "-其视线忽略暗区和夜晚规则。<br>-行动结束后，从棋盘上移除它视线中的一名幸存者（玩家选择）。在其下一次行动开始前，将幸存者送回同一区域。", 
+                flavor: "-“你已急哭。”<br>-“收到。”" 
+            },
+            { 
+                name: "下水道鳄鱼", hp: "3", type: "憎恶", expansion: "都市传说",
+                image: "../images/Sewer-Croc.webp", 
+                ability: "-随机选择一名幸存者作为猎物。<br>-它只会接近并攻击选择的幸存者，无视其他干扰。<br>-行动两次。", 
+                flavor: "“当然，下水道里有鳄鱼。黑帮分子会说，没有什么比鳄鱼更适合处理“证据”了。被感染后，丧尸鳄鱼会四处猎杀，享用下一顿新鲜的食物。”" 
+            },
+            { 
+                name: "小丑杀手", hp: "3", type: "憎恶", expansion: "都市传说",
+                image: "../images/Killer-Clown.webp", 
+                ability: "幸存者不能使用他们通过肾上腺素获得的最新技能（不适用于蓝色等级技能）。", 
+                flavor: "“我记得他。他整天躲在街角，笑得像疯子一样，跟踪人群，玩弄污水道。那家伙依然令人毛骨悚然又恶心。现在，他身上还有味道！”" 
+            },
+            { 
+                name: "四分卫", hp: "2", type: "疾行尸", expansion: "重启套装",
+                image: "../images/American-Football-Player-z2.webp", 
+                ability: "-它会沿一条直线移动直至撞到障碍物（墙壁、幸存者），它会撞倒停止区域的所有幸存者。<br>-被撞到的幸存者需花费一个行动点站起。<br>-需要两点伤害及以上的武器才能杀死。", 
+                flavor: "“趴下！预备！开球！这位选秀状元正值比赛中途被一名丧尸袭击。尽管在突袭中被咬伤，这位明星四分卫仍冲刺达阵78码，并在庆祝时吃掉了半个乐队成员、两名啦啦队员和一名水手。至少他赢了让分盘。”" 
+            },
+            { 
+                name: "神秘白衣女子", hp: "3", type: "未分级", expansion: "萧山中学",
+                image: "../images/fjq.png", 
+                ability: "-所有玩家只能用英文交流。<br>-神秘白衣女子在场时，受到伤害的玩家需弃置背包的所有物品。<br>-死亡时，在所在区域召唤神秘红衣女子，若后者已在场则立即执行一个行动。", 
+                flavor: "-“你我姐妹齐上，焉有一合之将！”-“姐姐说的在理！”" 
+            },
+            { 
+                name: "神秘红衣女子", hp: "3", type: "未分级", expansion: "萧山中学",
+                image: "../images/qwe.png", 
+                ability: "-所有玩家无法使用语言交流。<br>-行动两次，会直接瞬移到幸存者最少（至少为1）的区域。<br>-死亡时，在所在区域召唤神秘白衣女子，若后者已在场则立即执行一个行动。",
+                flavor: "-“你我姐妹齐上，焉有一合之将！”-“姐姐说的在理！”" 
+            },
+        ];
+
+        // 变量
+        const allExpansions = [...new Set(deckData.map(card => card.expansion))];
+        let activeExpansions = new Set(allExpansions);
+        
+        let filteredDeck = [];
+        let drawPile = [];
+        
+        let pendingCard = null;
+        let pendingCardIndex = -1;
+        let rarityType = 'common';
+        let isMuted = false;
+        
+        // 🚨 关键状态锁：防止重复点击和双重触发
+        let isProcessing = false; 
+        let isFlipped = false;
+
+        const wrapper = document.getElementById('interactionWrapper');
+        const cardElement = document.getElementById('gameCard');
+        const returnBtn = document.getElementById('returnBtn');
+        const mainReshuffleBtn = document.getElementById('mainReshuffleBtn');
+        const deckCounter = document.getElementById('deckCounter');
+        const burstLayer = document.getElementById('burstLayer'); 
+        const soundToggle = document.getElementById('soundToggle');
+        const filterMenu = document.getElementById('filterMenu');
+
+        const imgEl = document.getElementById('cardImage');
+        const nameEl = document.getElementById('infoName');
+        const hpEl = document.getElementById('infoHp');
+        const typeEl = document.getElementById('infoType');
+        const abilityEl = document.getElementById('infoAbility');
+        const flavorEl = document.getElementById('infoFlavor');
+
+        // Init
+        window.addEventListener('DOMContentLoaded', () => {
+            initFilterMenu();
+            manualReshuffle();
+        });
+
+        // 绑定洗牌
+        mainReshuffleBtn.addEventListener('click', (e) => {
+            e.stopPropagation();
+            manualReshuffle();
+        });
+
+        // 音效开关
+        soundToggle.addEventListener('click', () => {
+            isMuted = !isMuted;
+            soundToggle.classList.toggle('muted', isMuted);
+        });
+
+        // 初始化菜单
+        function initFilterMenu() {
+            allExpansions.forEach(exp => {
+                const label = document.createElement('label');
+                label.className = 'filter-item';
+                label.innerHTML = `
+                    <input type="checkbox" class="filter-checkbox" value="${exp}" checked>
+                    ${exp}
+                `;
+                label.querySelector('input').addEventListener('change', (e) => {
+                    if (e.target.checked) activeExpansions.add(exp);
+                    else {
+                        if (activeExpansions.size === 1 && activeExpansions.has(exp)) {
+                            e.target.checked = true; alert("至少选择一个扩展包！"); return;
+                        }
+                        activeExpansions.delete(exp);
+                    }
+                    manualReshuffle();
+                });
+                filterMenu.appendChild(label);
+            });
+        }
+
+        // 手动洗牌
+        function manualReshuffle() {
+            filteredDeck = deckData.filter(card => activeExpansions.has(card.expansion));
+            drawPile = [...filteredDeck];
+            console.log("Deck Reset. Count:", drawPile.length);
+            
+            // 重置状态
+            isFlipped = false;
+            isProcessing = false;
+            cardElement.classList.remove('is-flipped');
+            wrapper.classList.remove('active');
+            
+            // 准备第一张
+            prepareNextCard();
+        }
+
+        // 准备下一张 (仅预览光效，不锁死卡牌)
+        function prepareNextCard() {
+            updateCounter();
+
+            if (drawPile.length === 0) {
+                cardElement.classList.add('is-empty');
+                cardElement.setAttribute('data-rarity', 'empty');
+                pendingCard = null;
+                return;
+            }
+
+            cardElement.classList.remove('is-empty');
+
+            // 仅仅为了设置背面的光效颜色，此时不决定具体抽哪张
+            // 我们随机取一张来看看它的类型，用来设置呼吸灯颜色
+            // 真正的“抽取”动作延迟到点击时
+            const peekIndex = Math.floor(Math.random() * drawPile.length);
+            const peekCard = drawPile[peekIndex];
+            setRarityColor(peekCard);
+        }
+
+        // 设置光效辅助函数
+        function setRarityColor(card) {
+            rarityType = 'common';
+            const typeStr = card.type || "";
+            if (typeStr.includes('未分级')) rarityType = 'golden';
+            else if (typeStr.includes('憎恶')) rarityType = 'legendary';
+            else if (typeStr.includes('硕')) rarityType = 'epic';
+            else if (typeStr.includes('疾行')) rarityType = 'rare';
+            else rarityType = 'common';
+            
+            cardElement.setAttribute('data-rarity', rarityType);
+            burstLayer.style.setProperty('--rarity-color', getComputedStyle(document.documentElement).getPropertyValue(`--color-${rarityType}`));
+        }
+
+        // === 核心：点击抽卡 (带严格防抖锁) ===
+        cardElement.addEventListener('click', function(e) {
+            // 1. 严格检查状态
+            if (isFlipped || isProcessing || drawPile.length === 0) return;
+            
+            // 2. 上锁
+            isProcessing = true;
+
+            // 3. 正式抽取：随机选一张
+            const finalIndex = Math.floor(Math.random() * drawPile.length);
+            const finalCard = drawPile[finalIndex];
+            
+            // 4. 从数组移除 (Splice)
+            drawPile.splice(finalIndex, 1);
+            
+            // 5. 渲染内容
+            revealCard(finalCard);
+            setRarityColor(finalCard); // 确保翻开的光效和卡牌一致
+            
+            // 6. 翻转动画
+            cardElement.classList.add('is-flipped');
+            wrapper.classList.add('active'); 
+            
+            triggerBurst();
+            setTimeout(() => playRaritySound(rarityType), 200);
+            
+            isFlipped = true;
+            isProcessing = false; // 解锁
+            
+            // 7. 立即更新计数器 (让用户看到少了1张)
+            updateCounter();
+        });
+
+        // === 返回按钮 (带防抖锁) ===
+        returnBtn.addEventListener('click', function(e) {
+            e.stopPropagation();
+            
+            if (!isFlipped || isProcessing) return;
+            isProcessing = true;
+
+            cardElement.classList.remove('is-flipped');
+            wrapper.classList.remove('active'); 
+            
+            // 等翻转动画结束再允许下一次点击
+            setTimeout(() => {
+                isFlipped = false;
+                isProcessing = false;
+                prepareNextCard();
+            }, 600);
+        });
+
+        function revealCard(card) {
+            imgEl.src = card.image;
+            imgEl.onerror = () => imgEl.src = 'https://via.placeholder.com/400x600?text=No+Image';
+            nameEl.innerText = card.name;
+            hpEl.innerText = card.hp; 
+            typeEl.innerText = card.type;
+            abilityEl.innerHTML = `<div style="color:#f1c40f; font-size:0.9em; margin-bottom:8px;">能力：</div>${card.ability}`;
+            flavorEl.innerHTML = card.flavor;
+        }
+
+        function updateCounter() {
+            // 显示：剩余张数 / 总数
+            deckCounter.innerText = `${drawPile.length}/${filteredDeck.length}`;
+        }
+
+        function triggerBurst() {
+            const colorVar = getComputedStyle(document.documentElement).getPropertyValue(`--color-${rarityType}`);
+            burstLayer.style.setProperty('--rarity-color', colorVar);
+            burstLayer.classList.remove('active');
+            void burstLayer.offsetWidth; 
+            burstLayer.classList.add('active');
+        }
+
+        function playRaritySound(rarity) {
+            if (isMuted) return;
+            const audioMap = { 'common': '../audio/common.mp3', 'rare': '../audio/rare.mp3', 'epic': '../audio/epic.mp3', 'legendary': '../audio/legendary.mp3', 'golden': '../audio/golden.mp3' };
+            const audioFile = audioMap[rarity];
+            if (audioFile) { const audio = new Audio(audioFile); audio.volume = 0.8; audio.play().catch(e => console.log("Audio play failed:", e)); }
+        }
+    </script>
+</body>
+</html>
