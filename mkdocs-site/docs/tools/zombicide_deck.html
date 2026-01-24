@@ -10,7 +10,7 @@
     
     <style>
         :root {
-            /* === 桌面端默认参数 (大屏) === */
+            /* === 基础参数 === */
             --card-width: 44vh;
             --card-height: 62vh;
             --info-width: 360px;
@@ -36,28 +36,12 @@
             --color-golden: #fbc531;
         }
 
-        /* === 📱 平板/小笔记本适配 === */
+        /* === 📱 适配媒体查询 (保持不变) === */
         @media (max-width: 1200px) {
-            :root {
-                --card-width: 35vh;
-                --card-height: 50vh;
-                --info-width: 300px;
-                --font-hp: 4.5rem;
-                --font-name: 2.2rem;
-                --font-desc: 1.1rem;
-            }
+            :root { --card-width: 35vh; --card-height: 50vh; --info-width: 300px; --font-hp: 4.5rem; --font-name: 2.2rem; --font-desc: 1.1rem; }
         }
-
-        /* === 📱 手机/竖屏平板适配 === */
         @media (max-width: 768px) {
-            :root {
-                --card-width: 60vw; 
-                --card-height: 85vw; 
-                --info-width: 85vw;  
-                --font-hp: 4rem;
-                --font-name: 2rem;
-                --font-desc: 1rem;
-            }
+            :root { --card-width: 60vw; --card-height: 85vw; --info-width: 85vw; --font-hp: 4rem; --font-name: 2rem; --font-desc: 1rem; }
         }
 
         body {
@@ -70,8 +54,9 @@
             display: flex; flex-direction: column;
         }
 
+        /* 上下警戒条 */
         .hazard-bar {
-            height: 30px; width: 100%;
+            height: 30px; width: 100%; flex-shrink: 0;
             background: var(--stripe-pattern);
             box-shadow: 0 0 20px rgba(0,0,0,0.8);
             z-index: 100;
@@ -81,11 +66,185 @@
 
         .stage-center {
             flex: 1;
-            display: flex; align-items: center; justify-content: center;
-            perspective: 1500px; position: relative;
-            padding-bottom: 40px;
+            position: relative; 
+            width: 100%; height: 100%;
+            overflow: hidden;
         }
 
+        /* ========================================================
+           1. 视图切换系统
+           ======================================================== */
+        .view-section {
+            position: absolute; top: 0; left: 0; width: 100%; height: 100%;
+            display: none;
+            flex-direction: column; align-items: center; justify-content: center;
+            opacity: 0; transition: opacity 0.4s ease;
+        }
+        .view-section.active-view {
+            display: flex; opacity: 1; z-index: 10; pointer-events: auto;
+        }
+
+        /* ========================================================
+           2. 主菜单样式
+           ======================================================== */
+        .menu-container { display: flex; gap: 60px; align-items: center; justify-content: center; height: 100%; }
+        .menu-item { position: relative; cursor: pointer; transition: transform 0.3s; text-align: center; }
+        .menu-item:hover { transform: scale(1.1); z-index: 20; }
+        .menu-card-img {
+            width: 24vh; height: 34vh;
+            border-radius: 12px; border: 4px solid #000;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.8);
+            object-fit: cover; transition: all 0.3s;
+        }
+        #menuSkillCard { filter: grayscale(100%) brightness(0.6); }
+        .menu-item:hover #menuSkillCard { filter: grayscale(0%) brightness(1); border-color: var(--hazard-yellow); }
+        .menu-label {
+            position: absolute; top: -50px; left: 50%; transform: translateX(-50%);
+            color: var(--hazard-yellow); font-size: 2.5rem; white-space: nowrap;
+            text-shadow: 0 4px 0 #000; opacity: 0; transition: all 0.3s; pointer-events: none;
+        }
+        .menu-item:hover .menu-label { opacity: 1; top: -70px; }
+
+        @media (max-width: 768px) {
+            .menu-container { flex-direction: column; gap: 40px; }
+            .menu-card-img { width: 160px; height: 220px; }
+            .menu-label { opacity: 1; top: -40px; font-size: 1.8rem; }
+        }
+
+        /* ========================================================
+           3. 技能书样式 (大幅优化)
+           ======================================================== */
+        #view-skills {
+            /* 关键修改：给整个视图留出上下空间，防止箭头遮挡 */
+            padding-top: 60px; 
+            padding-bottom: 60px;
+            box-sizing: border-box;
+        }
+
+        .skill-grid-container {
+            width: 95%; max-width: 1400px; 
+            height: 100%; /* 占满剩余高度 */
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            grid-template-rows: repeat(3, 1fr);
+            gap: 25px; 
+            padding: 10px;
+            z-index: 20;
+        }
+
+        /* =========================================
+           修复后的技能框样式 (替换原有的 .skill-cell 相关代码)
+           ========================================= */
+        .skill-cell {
+            position: relative; 
+            /* 平时：背景半透明黑，让背后的条纹稍微透一点点出来，或者保持暗沉 */
+            background: rgba(10, 10, 10, 0.85); 
+            padding: 20px; 
+            text-align: center;
+            /* 平时：边框透明 (显示出下层的警戒线作为边框) */
+            border: 2px solid rgba(241, 196, 15, 0.3); 
+            box-shadow: 0 5px 10px rgba(0,0,0,0.5);
+            display: flex; flex-direction: column; align-items: center; justify-content: center;
+            transition: all 0.2s ease-in-out;
+            cursor: pointer; /* 鼠标变手型 */
+            overflow: hidden; /* 防止内容溢出 */
+        }
+        
+        /* 🟡 警戒线背景层 (平时作为装饰存在于底部) */
+        .skill-cell::before {
+            content: ''; position: absolute; top: 0; left: 0; right: 0; bottom: 0;
+            background: var(--stripe-pattern); 
+            z-index: -1; /* 放在最底层 */
+            opacity: 0.15; /*平时很淡，不干扰文字 */
+            transition: opacity 0.2s;
+        }
+
+        /* ✨ 悬停高亮效果 (核心修复) */
+        .skill-cell:hover {
+            transform: scale(1.05); /* 放大 */
+            
+            /* 关键修改1：悬停时背景变纯黑，确保文字清晰 */
+            background: #000; 
+            
+            /* 关键修改2：边框变亮黄，作为高亮指示 */
+            border-color: var(--hazard-yellow); 
+            
+            /* 关键修改3：添加黄色呼吸光晕 */
+            box-shadow: 0 0 25px rgba(241, 196, 15, 0.6); 
+            
+            z-index: 50;
+        }
+        
+        /* 悬停时，把内部的条纹彻底隐藏，防止干扰 */
+        .skill-cell:hover::before {
+            opacity: 0;
+        }
+
+        /* 技能标题 - 增加黑色描边，防止任何情况下的背景干扰 */
+        .skill-title { 
+            font-size: 2.2rem; 
+            margin-bottom: 12px; 
+            color: var(--hazard-yellow); 
+            text-shadow: 2px 2px 0 #000, -1px -1px 0 #000; /* 双重描边 */
+            letter-spacing: 2px;
+        }
+
+        /* 技能标题 */
+        .skill-title { 
+            font-size: 2.2rem; /* 增大字号 */
+            margin-bottom: 12px; 
+            color: var(--hazard-yellow); /* 确保是黄色 */
+            text-shadow: 2px 2px 4px #000; 
+            letter-spacing: 2px;
+        }
+
+        /* 技能描述 */
+        .skill-desc { 
+            font-family: 'Noto Serif SC', serif; 
+            color: #ffffff; /* 纯白，高对比度 */
+            font-size: 1.3rem; /* 增大字号 */
+            line-height: 1.4; 
+            text-align: left; 
+            width: 100%; 
+            text-shadow: 1px 1px 2px #000;
+        }
+
+        /* 翻页箭头 (位置调整) */
+        .nav-arrow {
+            position: absolute; left: 50%; transform: translateX(-50%);
+            font-size: 4rem; color: var(--hazard-yellow); cursor: pointer;
+            z-index: 50; transition: transform 0.2s;
+            filter: drop-shadow(0 4px 4px #000);
+            /* 增加点击区域 */
+            width: 100px; height: 50px; 
+            display: flex; align-items: center; justify-content: center;
+        }
+        .nav-arrow:hover { transform: translateX(-50%) scale(1.2); color: #fff; }
+        
+        /* 放在 Grid 容器的外面，防止遮挡 */
+        .nav-arrow.top { top: 10px; }
+        .nav-arrow.bottom { bottom: 10px; }
+        .hidden { display: none !important; }
+
+        /* 返回主菜单按钮 (右上角) */
+        .corner-return-btn {
+            position: absolute; top: 20px; right: 30px;
+            font-size: 3rem; color: var(--hazard-yellow); cursor: pointer;
+            z-index: 100; transition: transform 0.3s;
+            filter: drop-shadow(0 2px 4px #000);
+        }
+        .corner-return-btn:hover { transform: rotate(-20deg) scale(1.1); color: #fff; }
+
+        @media (max-width: 768px) {
+            .skill-grid-container { display: flex; flex-direction: column; overflow-y: auto; padding-bottom: 50px; }
+            .skill-cell { margin-bottom: 15px; min-height: 150px; }
+            .nav-arrow { display: none; } /* 手机端直接滑动 */
+            #view-skills { padding-top: 10px; padding-bottom: 10px; }
+        }
+
+        /* ========================================================
+           4. 抽卡界面 CSS (完整保留)
+           ======================================================== */
         /* 光爆层 */
         .burst-layer {
             position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%);
@@ -108,84 +267,35 @@
         .burst-layer.active .burst-core { animation: anim-core 0.8s cubic-bezier(0.1, 0.9, 0.2, 1) forwards; }
         .burst-layer.active .burst-glow { animation: anim-glow 1.2s ease-out forwards; }
         .burst-layer.active .burst-ring { animation: anim-ring 0.6s cubic-bezier(0, 0.9, 0.57, 1) forwards; }
-        
         @keyframes anim-core { 0% { width: 0; height: 0; opacity: 1; } 30% { opacity: 1; } 100% { width: 120vmin; height: 120vmin; opacity: 0; } }
         @keyframes anim-glow { 0% { width: 0; height: 0; opacity: 0.8; } 100% { width: 150vmax; height: 150vmax; opacity: 0; } }
         @keyframes anim-ring { 0% { width: 0; height: 0; opacity: 0; border-width: 20px; } 10% { opacity: 1; } 100% { width: 120vmin; height: 120vmin; opacity: 0; border-width: 0px; } }
 
-        /* === 交互容器 === */
+        /* 交互容器 */
         .interaction-container {
             display: flex; align-items: center; justify-content: center;
             width: var(--card-width); height: var(--card-height);
             transition: all 0.6s cubic-bezier(0.23, 1, 0.32, 1);
             position: relative; z-index: 10;
         }
-
-        /* 桌面端/平板悬停展开 - 【关键修复】 */
         @media (min-width: 769px) {
-            .interaction-container.active:hover { 
-                width: calc(var(--card-width) + var(--info-width) + 60px); 
-            }
-            .interaction-container.active:hover .scene { 
-                transform: rotate(-3deg) translateX(-60px) scale(1.1); 
-            }
-            .interaction-container.active:hover .info-panel { 
-                margin-left: 60px; 
-                opacity: 1; 
-                transform: translateX(0) translateZ(0); 
-                pointer-events: auto; /* <--- 修复点：桌面端必须要加这个，否则点不动 */
-            }
+            .interaction-container.active { width: calc(var(--card-width) + var(--info-width) + 60px); }
+            .interaction-container.active .scene { transform: rotate(-3deg) translateX(-60px) scale(1.1); }
+            .interaction-container.active .info-panel { margin-left: 60px; opacity: 1; transform: translateX(0) translateZ(0); pointer-events: auto; }
         }
-
-        /* === 📱 手机端特殊布局 - 【关键修复】 === */
         @media (max-width: 768px) {
-            .interaction-container {
-                flex-direction: column; 
-                height: auto; 
-            }
-            
-            .interaction-container.active .scene {
-                transform: scale(0.65) translateY(-20px); 
-                margin-bottom: -80px; 
-            }
-            
-            .interaction-container.active .info-panel {
-                margin-left: 0; 
-                margin-top: 20px;
-                opacity: 1; 
-                transform: translateY(0); 
-                pointer-events: auto; /* <--- 修复点：确保手机端也是可点击的 */
-                position: relative;
-                z-index: 100; /* <--- 修复点：大幅提高层级，防止被卡牌遮挡 */
-            }
-            
-            .reshuffle-container {
-                top: 105% !important; 
-            }
+            .interaction-container { flex-direction: column; height: auto; }
+            .interaction-container.active .scene { transform: scale(0.65) translateY(-20px); margin-bottom: -80px; }
+            .interaction-container.active .info-panel { margin-left: 0; margin-top: 20px; opacity: 1; transform: translateY(0); pointer-events: auto; position: relative; z-index: 100; }
+            .reshuffle-container { top: 105% !important; }
         }
 
-        .scene {
-            width: var(--card-width); height: var(--card-height);
-            position: relative; transition: transform 0.6s cubic-bezier(0.23, 1, 0.32, 1);
-            flex-shrink: 0; 
-        }
-
-        /* 卡牌 */
-        .card {
-            width: 100%; height: 100%; position: relative;
-            transition: transform 0.6s cubic-bezier(0.68, -0.55, 0.265, 1.55);
-            transform-style: preserve-3d; cursor: pointer; border-radius: 16px;
-        }
+        .scene { width: var(--card-width); height: var(--card-height); position: relative; transition: transform 0.6s cubic-bezier(0.23, 1, 0.32, 1); flex-shrink: 0; }
+        .card { width: 100%; height: 100%; position: relative; transition: transform 0.6s cubic-bezier(0.68, -0.55, 0.265, 1.55); transform-style: preserve-3d; cursor: pointer; border-radius: 16px; }
         .card.is-flipped { transform: rotateY(180deg); }
         .card.is-empty { cursor: not-allowed; filter: grayscale(100%); opacity: 0.7; }
-        
-        .card:not(.is-empty)::before {
-            content: ''; position: absolute; top: -15px; left: -15px; right: -15px; bottom: -15px;
-            background: var(--rarity-color); z-index: -1; filter: blur(20px); opacity: 0;
-            transition: opacity 0.5s ease; border-radius: 30px;
-        }
+        .card:not(.is-empty)::before { content: ''; position: absolute; top: -15px; left: -15px; right: -15px; bottom: -15px; background: var(--rarity-color); z-index: -1; filter: blur(20px); opacity: 0; transition: opacity 0.5s ease; border-radius: 30px; }
         .card:not(.is-flipped):not(.is-empty):hover::before { opacity: 0.4; }
-        
         .card[data-rarity="common"] { --rarity-color: var(--color-common); }
         .card[data-rarity="rare"] { --rarity-color: var(--color-rare); }
         .card[data-rarity="epic"] { --rarity-color: var(--color-epic); }
@@ -193,174 +303,55 @@
         .card[data-rarity="golden"] { --rarity-color: var(--color-golden); }
         .card[data-rarity="empty"] { --rarity-color: #555; }
 
-        .card__face {
-            position: absolute; width: 100%; height: 100%;
-            -webkit-backface-visibility: hidden; backface-visibility: hidden;
-            border-radius: 16px; overflow: hidden;
-            border: 4px solid #000; background-color: #000;
-            box-shadow: inset 0 0 20px rgba(0,0,0,0.8); 
-        }
-        .card__face--front { 
-            background-color: #8E2F39; 
-            background-image: url('../images/card_back.png'); 
-            background-size: cover; background-position: center; 
-            display: flex; align-items: center; justify-content: center;
-        }
-        .empty-msg {
-            display: none; font-size: 1.8rem; color: #fff; text-shadow: 0 0 10px #000;
-            transform: rotate(-15deg); border: 4px solid #fff; padding: 10px 20px;
-        }
+        .card__face { position: absolute; width: 100%; height: 100%; -webkit-backface-visibility: hidden; backface-visibility: hidden; border-radius: 16px; overflow: hidden; border: 4px solid #000; background-color: #000; box-shadow: inset 0 0 20px rgba(0,0,0,0.8); }
+        .card__face--front { background-color: #8E2F39; background-image: url('../images/card_back.png'); background-size: cover; background-position: center; display: flex; align-items: center; justify-content: center; }
+        .empty-msg { display: none; font-size: 1.8rem; color: #fff; text-shadow: 0 0 10px #000; transform: rotate(-15deg); border: 4px solid #fff; padding: 10px 20px; }
         .card.is-empty .empty-msg { display: block; }
-
         .card__face--back { transform: rotateY(180deg); display: flex; align-items: center; justify-content: center; position: relative; }
-
-        .sheen-overlay {
-            position: absolute; top: 0; left: -150%; width: 100%; height: 100%;
-            background: linear-gradient(to right, transparent 0%, rgba(255,255,255,0.4) 50%, transparent 100%);
-            transform: skewX(-25deg); pointer-events: none; z-index: 20; mix-blend-mode: overlay;
-        }
+        .sheen-overlay { position: absolute; top: 0; left: -150%; width: 100%; height: 100%; background: linear-gradient(to right, transparent 0%, rgba(255,255,255,0.4) 50%, transparent 100%); transform: skewX(-25deg); pointer-events: none; z-index: 20; mix-blend-mode: overlay; }
         .card.is-flipped .sheen-overlay { animation: sheen-anim 0.8s ease-out 0.2s; }
         @keyframes sheen-anim { 0% { left: -150%; opacity: 0; } 50% { opacity: 1; } 100% { left: 150%; opacity: 0; } }
-
-        .hazard-border-overlay {
-            position: absolute; top: 0; left: 0; right: 0; bottom: 0; z-index: 10;
-            background: var(--stripe-pattern);
-            -webkit-mask: linear-gradient(#fff, #fff) content-box, linear-gradient(#fff, #fff);
-            -webkit-mask-composite: xor; mask-composite: exclude;
-            padding: 12px; pointer-events: none;
-        }
+        .hazard-border-overlay { position: absolute; top: 0; left: 0; right: 0; bottom: 0; z-index: 10; background: var(--stripe-pattern); -webkit-mask: linear-gradient(#fff, #fff) content-box, linear-gradient(#fff, #fff); -webkit-mask-composite: xor; mask-composite: exclude; padding: 12px; pointer-events: none; }
         .card-image-full { width: 100%; height: 100%; object-fit: cover; }
 
-        /* === 信息栏 === */
-        .info-panel {
-            width: var(--info-width);
-            margin-left: calc(var(--info-width) * -1); /* 初始隐藏在左侧 */
-            opacity: 0;
-            transform: translateX(30px) translateZ(-100px);
-            display: flex; flex-direction: column; gap: 20px;
-            z-index: 1; transition: all 0.6s cubic-bezier(0.23, 1, 0.32, 1);
-            
-            /* ⚠️ 核心：默认不响应鼠标，只有 active 时才响应 */
-            pointer-events: none; 
-        }
-        
-        .info-box {
-            position: relative; background: rgba(0,0,0,0.9); padding: 15px 20px;
-            color: var(--hazard-yellow); text-align: center;
-            border: 4px solid transparent; background-clip: padding-box;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.6);
-        }
-        .info-box::before {
-            content: ''; position: absolute; top: -4px; bottom: -4px; left: -4px; right: -4px;
-            background: var(--stripe-pattern); z-index: -1; border-radius: 6px;
-        }
-        
+        .info-panel { width: var(--info-width); margin-left: calc(var(--info-width) * -1); opacity: 0; transform: translateX(30px) translateZ(-100px); display: flex; flex-direction: column; gap: 20px; z-index: 1; transition: all 0.6s cubic-bezier(0.23, 1, 0.32, 1); pointer-events: none; }
+        .info-box { position: relative; background: rgba(0,0,0,0.9); padding: 15px 20px; color: var(--hazard-yellow); text-align: center; border: 4px solid transparent; background-clip: padding-box; box-shadow: 0 10px 30px rgba(0,0,0,0.6); }
+        .info-box::before { content: ''; position: absolute; top: -4px; bottom: -4px; left: -4px; right: -4px; background: var(--stripe-pattern); z-index: -1; border-radius: 6px; }
         .info-title-box { display: flex; justify-content: center; align-items: center; min-height: 60px; position: relative; overflow: visible; }
-        .info-name { 
-            font-family: 'ZCOOL QingKe HuangYou', sans-serif; 
-            font-size: var(--font-name); 
-            letter-spacing: 2px; text-shadow: 3px 3px 0 #000; 
-        }
-        .hp-badge {
-            position: absolute; top: -40px; right: -20px;
-            font-family: 'Permanent Marker', cursive; 
-            font-size: var(--font-hp);
-            color: #000; -webkit-text-stroke: 3px var(--hazard-yellow);
-            filter: drop-shadow(4px 4px 0px rgba(0,0,0,0.6)); transform: rotate(15deg); z-index: 10; pointer-events: none;
-        }
-        
-        .info-desc-box { 
-            text-align: left; 
-            font-size: var(--font-desc); 
-            line-height: 1.5; text-shadow: 2px 2px 0 #000; font-family: 'ZCOOL QingKe HuangYou', sans-serif; 
-        }
-        .type-tag { 
-            display: inline-block; background: var(--hazard-yellow); color: #000; font-family: 'ZCOOL QingKe HuangYou', sans-serif; 
-            padding: 4px 10px; border-radius: 4px; margin-bottom: 10px; 
-            font-size: 1rem; letter-spacing: 1px; box-shadow: 3px 3px 0 rgba(0,0,0,0.5); transform: rotate(-2deg); text-shadow: none; 
-        }
-        
-        .info-flavor-box {
-            font-family: 'Noto Serif SC', serif; font-style: italic; font-weight: 700;
-            font-size: 1rem; color: #eee; text-align: left; line-height: 1.6;
-            min-height: 60px; display: flex; flex-direction: column; justify-content: space-between;
-        }
+        .info-name { font-family: 'ZCOOL QingKe HuangYou', sans-serif; font-size: var(--font-name); letter-spacing: 2px; text-shadow: 3px 3px 0 #000; }
+        .hp-badge { position: absolute; top: -40px; right: -20px; font-family: 'Permanent Marker', cursive; font-size: var(--font-hp); color: #000; -webkit-text-stroke: 3px var(--hazard-yellow); filter: drop-shadow(4px 4px 0px rgba(0,0,0,0.6)); transform: rotate(15deg); z-index: 10; pointer-events: none; }
+        .info-desc-box { text-align: left; font-size: var(--font-desc); line-height: 1.5; text-shadow: 2px 2px 0 #000; font-family: 'ZCOOL QingKe HuangYou', sans-serif; }
+        .type-tag { display: inline-block; background: var(--hazard-yellow); color: #000; font-family: 'ZCOOL QingKe HuangYou', sans-serif; padding: 4px 10px; border-radius: 4px; margin-bottom: 10px; font-size: 1rem; letter-spacing: 1px; box-shadow: 3px 3px 0 rgba(0,0,0,0.5); transform: rotate(-2deg); text-shadow: none; }
+        .info-flavor-box { font-family: 'Noto Serif SC', serif; font-style: italic; font-weight: 700; font-size: 1rem; color: #eee; text-align: left; line-height: 1.6; min-height: 60px; display: flex; flex-direction: column; justify-content: space-between; }
         .flavor-text { margin-bottom: 10px; opacity: 0.95; text-shadow: 1px 1px 0 #000; }
-        
-        .card-actions {
-            display: flex; align-items: center; justify-content: center; gap: 15px;
-            padding-top: 10px; border-top: 2px dashed rgba(255,255,255,0.2);
-        }
+        .card-actions { display: flex; align-items: center; justify-content: center; gap: 15px; padding-top: 10px; border-top: 2px dashed rgba(255,255,255,0.2); }
         .return-btn { cursor: pointer; font-size: 2.2rem; color: var(--hazard-yellow); transition: transform 0.2s; }
         .return-btn:hover { transform: scale(1.2) rotate(-20deg); color: #fff; }
-        
-        .deck-counter {
-            font-family: 'Permanent Marker', cursive; font-size: 1.3rem; color: #fff;
-            background: #000; padding: 2px 8px; border-radius: 4px; border: 1px solid var(--hazard-yellow);
-            transform: rotate(5deg);
-        }
+        .deck-counter { font-family: 'Permanent Marker', cursive; font-size: 1.3rem; color: #fff; background: #000; padding: 2px 8px; border-radius: 4px; border: 1px solid var(--hazard-yellow); transform: rotate(5deg); }
 
-        /* 按钮组件 */
-        .action-btn {
-            background: #000; color: var(--hazard-yellow); border: 2px solid var(--hazard-yellow);
-            padding: 8px; border-radius: 50%; cursor: pointer; opacity: 0.7; transition: all 0.3s;
-            display: flex; align-items: center; justify-content: center;
-        }
+        .action-btn { background: #000; color: var(--hazard-yellow); border: 2px solid var(--hazard-yellow); padding: 8px; border-radius: 50%; cursor: pointer; opacity: 0.7; transition: all 0.3s; display: flex; align-items: center; justify-content: center; }
         .action-btn:hover { opacity: 1; transform: scale(1.1); box-shadow: 0 0 15px var(--hazard-yellow); }
         .action-btn svg { width: 22px; height: 22px; display: block; }
-
-        .sound-toggle { position: fixed; bottom: 80px; left: 20px; z-index: 200; }
+        .sound-toggle { position: fixed; bottom: 50px; left: 20px; z-index: 300; }
         .sound-off-icon { display: none; }
         .sound-toggle.muted .sound-on-icon { display: none; }
         .sound-toggle.muted .sound-off-icon { display: block; }
-
-        /* 洗牌按钮 */
-        .reshuffle-container {
-            position: absolute; top: 110%; left: 50%; transform: translateX(-50%);
-            z-index: 20; opacity: 0; pointer-events: none; transition: opacity 0.3s;
-        }
+        .reshuffle-container { position: absolute; top: 110%; left: 50%; transform: translateX(-50%); z-index: 20; opacity: 0; pointer-events: none; transition: opacity 0.3s; }
         .interaction-container:not(.active) .reshuffle-container { opacity: 1; pointer-events: auto; }
-        
-        .reshuffle-btn {
-            background: var(--hazard-yellow); color: #000; border: none;
-            font-family: 'ZCOOL QingKe HuangYou', sans-serif; font-size: 1.3rem;
-            padding: 8px 20px; clip-path: polygon(10% 0, 100% 0, 90% 100%, 0% 100%);
-            cursor: pointer; box-shadow: 0 5px 15px rgba(0,0,0,0.5);
-            transition: transform 0.2s; white-space: nowrap;
-        }
+        .reshuffle-btn { background: var(--hazard-yellow); color: #000; border: none; font-family: 'ZCOOL QingKe HuangYou', sans-serif; font-size: 1.3rem; padding: 8px 20px; clip-path: polygon(10% 0, 100% 0, 90% 100%, 0% 100%); cursor: pointer; box-shadow: 0 5px 15px rgba(0,0,0,0.5); transition: transform 0.2s; white-space: nowrap; }
         .reshuffle-btn:hover { transform: scale(1.1); color: #fff; background: #d35400; }
         .reshuffle-btn:active { transform: scale(0.95); }
 
         /* 扩展包过滤器 */
-        .filter-wrapper {
-            position: fixed; bottom: 40px; right: 15px; z-index: 300;
-            display: flex; flex-direction: column; align-items: flex-end;
-        }
-        .filter-icon {
-            width: auto; height: auto; max-width: 80px; max-height: 80px;
-            cursor: pointer; filter: drop-shadow(0 4px 6px rgba(0,0,0,0.5));
-            transition: transform 0.3s;
-        }
+        .filter-wrapper { position: fixed; bottom: 40px; right: 15px; z-index: 300; display: flex; flex-direction: column; align-items: flex-end; }
+        .filter-icon { width: auto; height: auto; max-width: 80px; max-height: 80px; cursor: pointer; filter: drop-shadow(0 4px 6px rgba(0,0,0,0.5)); transition: transform 0.3s; }
         .filter-wrapper:hover .filter-icon { transform: scale(1.1) rotate(-10deg); }
-        .filter-menu {
-            position: absolute; bottom: 75px; right: 0; width: 180px;
-            background: rgba(0,0,0,0.95); border: 2px solid var(--hazard-yellow);
-            padding: 10px; box-shadow: 0 10px 30px rgba(0,0,0,0.8);
-            opacity: 0; visibility: hidden; transform: translateY(20px) scale(0.9);
-            transition: all 0.3s;
-            background-image: repeating-linear-gradient(45deg, rgba(241,196,15,0.05) 0, rgba(241,196,15,0.05) 10px, transparent 10px, transparent 20px);
-        }
+        .filter-menu { position: absolute; bottom: 75px; right: 0; width: 180px; background: rgba(0,0,0,0.95); border: 2px solid var(--hazard-yellow); padding: 10px; box-shadow: 0 10px 30px rgba(0,0,0,0.8); opacity: 0; visibility: hidden; transform: translateY(20px) scale(0.9); transition: all 0.3s; background-image: repeating-linear-gradient(45deg, rgba(241,196,15,0.05) 0, rgba(241,196,15,0.05) 10px, transparent 10px, transparent 20px); }
         .filter-wrapper:hover .filter-menu { opacity: 1; visibility: visible; transform: translateY(0) scale(1); }
-        .menu-title {
-            color: var(--hazard-yellow); font-size: 1.1rem; margin-bottom: 8px;
-            border-bottom: 1px dashed rgba(241, 196, 15, 0.3); padding-bottom: 4px; text-align: center;
-        }
+        .menu-title { color: var(--hazard-yellow); font-size: 1.1rem; margin-bottom: 8px; border-bottom: 1px dashed rgba(241, 196, 15, 0.3); padding-bottom: 4px; text-align: center; }
         .filter-item { display: flex; align-items: center; margin-bottom: 6px; cursor: pointer; color: #fff; font-size: 0.95rem; transition: color 0.2s; }
         .filter-item:hover { color: var(--hazard-yellow); }
-        .filter-checkbox {
-            appearance: none; -webkit-appearance: none; width: 16px; height: 16px;
-            border: 2px solid var(--hazard-yellow); background: transparent; margin-right: 8px; position: relative; cursor: pointer;
-        }
+        .filter-checkbox { appearance: none; -webkit-appearance: none; width: 16px; height: 16px; border: 2px solid var(--hazard-yellow); background: transparent; margin-right: 8px; position: relative; cursor: pointer; }
         .filter-checkbox:checked { background: var(--hazard-yellow); }
         .filter-checkbox:checked::after { content: '✔'; position: absolute; color: #000; font-size: 12px; font-weight: bold; top: -2px; left: 1px; }
 
@@ -371,49 +362,79 @@
     <div class="hazard-bar top"></div>
 
     <div class="stage-center">
-        <div class="burst-layer" id="burstLayer">
-            <div class="burst-glow"></div>
-            <div class="burst-core"></div>
-            <div class="burst-ring"></div>
-        </div>
-
-        <div class="interaction-container" id="interactionWrapper">
-            <div class="scene">
-                <div class="reshuffle-container">
-                    <button class="reshuffle-btn" id="mainReshuffleBtn">🔄 重置牌堆</button>
+        
+        <div id="view-menu" class="view-section active-view">
+            <div class="menu-container">
+                <div class="menu-item" onclick="switchView('view-draw')">
+                    <div class="menu-label">特感牌堆</div>
+                    <img src="../images/card_back.png" class="menu-card-img" alt="Deck">
                 </div>
-
-                <div class="card" id="gameCard" data-rarity="common">
-                    <div class="card__face card__face--front">
-                        <div class="empty-msg">牌堆耗尽<br>请洗牌</div>
-                    </div>
-                    <div class="card__face card__face--back">
-                        <div class="hazard-border-overlay"></div>
-                        <div class="sheen-overlay"></div>
-                        <img id="cardImage" class="card-image-full" src="" alt="Abomination">
-                    </div>
-                </div>
-            </div>
-
-            <div class="info-panel">
-                <div class="info-box info-title-box">
-                    <div class="info-name" id="infoName">LOADING</div>
-                    <div class="hp-badge" id="infoHp">3</div>
-                </div>
-                <div class="info-box info-desc-box">
-                    <div id="infoType" class="type-tag">TYPE</div>
-                    <div id="infoAbility">Ability text...</div>
-                </div>
-                <div class="info-box info-flavor-box">
-                    <div class="flavor-text" id="infoFlavor">"Flavor text..."</div>
-                    
-                    <div class="card-actions">
-                        <div class="return-btn" id="returnBtn" title="返回牌库">↩</div>
-                        <div class="deck-counter" id="deckCounter">0/0</div>
-                    </div>
+                <div class="menu-item" onclick="switchView('view-skills')">
+                    <div class="menu-label">技能组</div>
+                    <img src="../images/card_back2.png" id="menuSkillCard" class="menu-card-img" alt="Skills" onerror="this.src='https://via.placeholder.com/180x260?text=SKILLS'">
                 </div>
             </div>
         </div>
+
+        <div id="view-draw" class="view-section">
+            <div class="burst-layer" id="burstLayer">
+                <div class="burst-glow"></div>
+                <div class="burst-core"></div>
+                <div class="burst-ring"></div>
+            </div>
+
+            <div class="interaction-container" id="interactionWrapper">
+                <div class="scene">
+                    <div class="reshuffle-container">
+                        <button class="reshuffle-btn" id="mainReshuffleBtn">🔄 重置牌堆</button>
+                    </div>
+
+                    <div class="card" id="gameCard" data-rarity="common">
+                        <div class="card__face card__face--front">
+                            <div class="empty-msg">牌堆耗尽<br>请洗牌</div>
+                        </div>
+                        <div class="card__face card__face--back">
+                            <div class="hazard-border-overlay"></div>
+                            <div class="sheen-overlay"></div>
+                            <img id="cardImage" class="card-image-full" src="" alt="Abomination">
+                        </div>
+                    </div>
+                </div>
+
+                <div class="info-panel">
+                    <div class="info-box info-title-box">
+                        <div class="info-name" id="infoName">LOADING</div>
+                        <div class="hp-badge" id="infoHp">3</div>
+                    </div>
+                    <div class="info-box info-desc-box">
+                        <div id="infoType" class="type-tag">TYPE</div>
+                        <div id="infoAbility">Ability text...</div>
+                    </div>
+                    <div class="info-box info-flavor-box">
+                        <div class="flavor-text" id="infoFlavor">"Flavor text..."</div>
+                        
+                        <div class="card-actions">
+                            <div class="return-btn" id="returnBtn" title="返回牌库">↩</div>
+                            <div class="deck-counter" id="deckCounter">0/0</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="corner-return-btn" onclick="switchView('view-menu')" title="返回主菜单">↩</div>
+        </div>
+
+        <div id="view-skills" class="view-section">
+            <div class="nav-arrow top hidden" id="skillUpBtn" onclick="scrollSkills(-1)">▲</div>
+            
+            <div class="skill-grid-container" id="skillGrid">
+                </div>
+
+            <div class="nav-arrow bottom" id="skillDownBtn" onclick="scrollSkills(1)">▼</div>
+            
+            <div class="corner-return-btn" onclick="switchView('view-menu')" title="返回主菜单">↩</div>
+        </div>
+
     </div>
 
     <div class="sound-toggle action-btn" id="soundToggle" title="开关语音">
@@ -430,16 +451,16 @@
 
     <div class="hazard-bar bottom"></div>
 
-    <script>
+        <script>
         // ===============================================
         // 🛠️ 数据录入区
         // ===============================================
         const deckData = [
             { 
-                name: "流浪憎恶", hp: "3", type: "憎恶", expansion: "基础",
+                name: "流浪恶鬼", hp: "3", type: "憎恶", expansion: "基础",
                 image: "../images/Abomination-3.webp", 
-                ability: "在流浪者所在区域的幸存者无法执行战斗动作。", 
-                flavor: "“流浪者在各方面都极其恶心，站在它旁边简直让人无法忍受。”" 
+                ability: "处于流浪恶鬼所在区域的幸存者无法执行战斗动作。", 
+                flavor: "“流浪恶鬼在各方面都极其恶心，站在它旁边简直让人无法忍受。”" 
             },
             { 
                 name: "零号病人", hp: "3", type: "憎恶", expansion: "基础",
@@ -448,16 +469,16 @@
                 flavor: "“真的是第一个丧尸吗？没人能说出来。这它确实把医院变成了感染的噩梦。”" 
             },
             { 
-                name: "警员", hp: "3", type: "憎恶", expansion: "基础",
+                name: "变异警员", hp: "3", type: "憎恶", expansion: "基础",
                 image: "../images/Abomination-1.webp", 
                 ability: "被攻击时，警员作为其所在区域的优先目标。", 
                 flavor: "“它想必扮演过好几次坏警察。”" 
             },
             { 
-                name: "荒野憎恶", hp: "3", type: "憎恶", expansion: "基础",
+                name: "狂野憎恶", hp: "3", type: "憎恶", expansion: "基础",
                 image: "../images/Abomination-2.webp", 
-                ability: "在荒野憎恶所在区域投掷燃烧瓶时，仅杀死荒野憎恶。其他行动者不受影响。", 
-                flavor: "“荒野憎恶是个难对付的硬茬，需要集中火力来解决。我是说字面意思上的‘火’力！”" 
+                ability: "在狂野憎恶所在区域投掷燃烧瓶时，仅杀死荒野憎恶。其他行动者不受影响。", 
+                flavor: "“狂野憎恶是个难对付的硬茬，需要集中火力来解决。我是说字面意思上的‘火’力！”" 
             },
             { 
                 name: "外星人", hp: "3", type: "憎恶", expansion: "都市传说",
@@ -509,22 +530,293 @@
             },
         ];
 
-        // 变量
+        // 技能组数据
+        const skillsData = [
+            {
+                name: "+1 行动",
+                desc: "幸存者获得一个额外的行动点，可以随意使用。"
+            },
+            {
+                name: "+1 伤害：[行动]",
+                desc: "幸存者在使用特定类型的行动（战斗、近战或远程）时，获得 +1 伤害加成。"
+            },
+            {
+                name: "+1 骰子：[行动]",
+                desc: "幸存者在使用特定类型的行动（战斗、近战或远程）时，其每把武器都可以额外投掷一颗骰子。如果是双持武器，则每一把都获得一颗骰子，也就是在进行该特定类型的双持行动时总共增加 2 颗骰子。"
+            },
+            {
+                name: "+1 免费 [行动类型]行动",
+                desc: "幸存者获得 1 个指定类型（战斗、近战、移动、远程或搜索）的额外免费行动。此行动只能用于执行该特定类型的行动。"
+            },
+            {
+                name: "+1 最大射程",
+                desc: "幸存者使用的远程武器的最大射程增加 1。"
+            },
+            {
+                name: "+1 移动区域",
+                desc: "当幸存者花费 1 个行动进行移动时，他们可以移动 1 或 2 个区域，而不是默认的 1 个。进入一个包含丧尸的区域仍然会立刻结束幸存者的移动行动。"
+            },
+            {
+                name: "+1点数：[行动]",
+                desc: "幸存者在使用特定类型的行动（战斗、近战或远程）进行检定的一颗骰子结果上增加 1。最大结果永远是 6。"
+            },
+            {
+                name: "[行动类型]：伤害 2",
+                desc: "当幸存者使用指定类型（战斗、近战或远程）的武器，且该武器原本伤害值为 1 时，该武器被视为拥有 2 点伤害值。"
+            },
+            {
+                name: "再来一瓶",
+                desc: "每当幸存者弃掉一张燃烧瓶卡牌来执行远程行动时，投掷一颗骰子。如果结果为 5 或更高（5+），该燃烧瓶装备卡可以免费放回幸存者的背包中，而不是被弃掉。此骰子结果不可被更改或重投。"
+            },
+            {
+                name: "左右开弓",
+                desc: "该幸存者将所有武器都视为拥有“双持”符号。"
+            },
+            {
+                name: "野蛮冲撞",
+                desc: "在结算近战行动时，幸存者可以将他们使用的近战武器的骰子数量替换为他们所在区域内的丧尸数量。影响骰子数值的技能（如 +1 骰子：近战）仍然适用。"
+            },
+            {
+                name: "闪电突袭",
+                desc: "幸存者每回合可以使用此技能一次。幸存者花费 1 个行动：他们最多移动 2 个区域，到达一个有丧尸处于射程内的区域。然后他们获得 1 次免费的远程行动。正常的移动规则依然适用。"
+            },
+            {
+                name: "嗜血：[行动]",
+                desc: "幸存者每回合可以使用此技能一次。幸存者花费 1 个行动：他们最多移动 2 个区域，到达一个包含至少 1 个丧尸的区域。然后他们获得 1 次指定类型（战斗、近战或远程）的免费行动。正常的移动规则依然适用。"
+            },
+            {
+                name: "天生领袖",
+                desc: "在幸存者的回合中，该幸存者可以给予另一位幸存者 1 个免费行动，供其随意使用。这个行动必须立即使用。之后，拥有“天生领袖”技能的幸存者继续其回合。"
+            },
+            {
+                name: "破门而入",
+                desc: "幸存者不需要任何装备即可开门。使用此技能时不会产生噪音。但是，其他前提条件仍然适用（例如在开门前必须拿取指定的任务目标）。此外，幸存者获得一个只能用于开门的额外免费行动。"
+            },
+            {
+                name: "兄弟会：[游戏效果]",
+                desc: "只要幸存者与至少 1 位其他幸存者站在同一区域，就可以使用此技能。只要“战友”是激活状态，该区域内的每位幸存者（包括拥有此技能的那位）都会获得指定的技能或游戏效果。同伴无法从此技能中受益。"
+            },
+            {
+                name: "重复搜索",
+                desc: "幸存者每回合可以进行多次搜索，每次搜索行动花费 1 个行动。"
+            },
+            {
+                name: "冲锋",
+                desc: "幸存者每回合可以使用此技能一次，免费。他们最多移动 2 个区域，到达一个包含至少 1 个丧尸的区域。正常的移动规则依然适用。进入一个包含丧尸的区域仍然会结束幸存者的移动行动。"
+            },
+            {
+                name: "战斗反射",
+                desc: "每当有任何丧尸在 0-1 射程内生成时（且在任何“突袭”之前），幸存者可以立即对它们执行一次免费的战斗行动。此行动消灭的丧尸数量可能多于生成的数量。远程行动必须瞄准丧尸生成的区域。每抽一张丧尸卡，幸存者可以使用此技能一次。"
+            },
+            {
+                name: "天命",
+                desc: "当幸存者通过抽卡揭示一张装备卡时，每回合可以使用此技能一次。他们可以忽略并弃掉那张卡。然后，从同一牌堆中再抽一张装备卡。"
+            },
+            {
+                name: "分配员",
+                desc: "在丧尸阶段的生成步骤结算时，根据活跃的生成点数量抽取相应数量的丧尸卡。查看这些丧尸卡，然后将其中 1 张分配给每个活跃的生成点，并按指示生成丧尸。"
+            },
+            {
+                name: "无畏者：[丧尸类型]",
+                desc: "幸存者忽略所有来自名称中包含指定关键字的丧尸造成的伤害。例如，“无畏者：行尸”对任何行尸都有效。"
+            },
+            {
+                name: "双持专家",
+                desc: "只要幸存者装备了双持武器，就拥有一个免费的战斗行动。此行动只能使用已装备的双持武器进行。"
+            },
+            {
+                name: "渐入佳境：[行动]",
+                desc: "幸存者在连续执行指定类型（战斗、近战或远程）的行动时，获得 1 颗额外的骰子。该加成是累积的，并持续到幸存者的回合结束。一旦幸存者执行了另一种类型的行动，加成就会消失。例如：拥有“渐入佳境：远程”技能的幸存者花费第 1 个行动用手枪（骰子 1）进行远程行动。他们的第 2 个行动也用于远程行动，由于逐步升级技能，增加了一颗额外的骰子（骰子 2）。第 3 个行动用于移动行动。升级加成丢失。"
+            },
+            {
+                name: "战地医生",
+                desc: "幸存者每回合可以使用此技能一次。幸存者花费 1 个行动：他们最多移动 2 个区域，到达一个包含至少 1 位幸存者的区域。然后，他们可以治疗 1 点伤害（可以治疗目标区域内的任何幸存者，包括自己）。正常的移动规则依然适用。即使目标区域内的所有幸存者都没有受伤，也可以使用战地医生技能。"
+            },
+            {
+                name: "免费装填",
+                desc: "幸存者可以免费装填可装填的武器（如妈咪的霰弹枪、截短霰弹枪等）。"
+            },
+            {
+                name: "全自动",
+                desc: "当结算远程行动时，幸存者可以将他们使用的远程武器的骰子数量替换为目标区域内站立的丧尸数量。影响骰子数值的技能（如 +1 骰子：远程）仍然适用。"
+            },
+            {
+                name: "枪手",
+                desc: "该幸存者将所有远程武器视为拥有“双持”符号。"
+            },
+            {
+                name: "游击",
+                desc: "幸存者在结算完一次近战或远程行动并导致至少 1 个丧尸被消灭后，可以立即免费使用此技能。幸存者进行一次免费的移动行动。如果他们所在的区域有丧尸，执行此免费移动行动不花费额外行动点。"
+            },
+            {
+                name: "储物专家",
+                desc: "幸存者可以额外携带最多 2 张装备卡。它们放置在玩家面板附近，被视为在背包中。"
+            },
+            {
+                name: "捏住鼻子",
+                desc: "每当幸存者所在区域内的最后一个丧尸被消灭（无论是被该幸存者、其他幸存者还是游戏效果消灭）时，该幸存者抽取一张装备卡（仅限核心装备牌堆）。此技能在任何区域（甚至是街道区域）都有效，并且可以在同一回合内多次使用。这不被视为搜索行动。"
+            },
+            {
+                name: "家园守卫者",
+                desc: "当视线穿过建筑物区域时，幸存者不受 0-1 射程的限制。"
+            },
+            {
+                name: "临时武器：近战",
+                desc: "幸存者每回合可以使用此技能一次。他们使用特定特征进行一次免费的近战攻击（见图示：骰子 2，命中 4+，伤害 1）。近战修正值（例如其他技能）适用。"
+            },
+            {
+                name: "临时武器：远程",
+                desc: "幸存者每回合可以使用此技能一次。他们使用特定特征进行一次免费的远程攻击（见图示：射程 1-1，骰子 2，命中 4+，伤害 1）。远程修正值（例如其他技能）适用。"
+            },
+            {
+                name: "就这",
+                desc: "此技能可以在幸存者即将承受伤害（Wounds）时的任何时候使用。每从幸存者的物品栏中弃掉一张装备卡，即可抵消 1 点伤害。"
+            },
+            {
+                name: "跳跃",
+                desc: "幸存者每回合可以使用此技能一次。幸存者花费 1 个行动并移动 2 个区域。忽略中间区域的所有内容，除了墙壁和关闭的门。与移动相关的技能（如“移动增加 1 区域”或“滑溜”）被忽略，但移动惩罚（如起始区域有丧尸）仍然适用。"
+            },
+            {
+                name: "救生员",
+                desc: "幸存者每回合可以使用此技能一次，免费。选择一个包含至少 1 个丧尸和至少 1 个幸存者且距离该幸存者射程 1 的区域。两个区域之间必须有清晰的路径和视线。选择所选区域内的幸存者被拖到该幸存者的区域，不受惩罚。这不是移动行动。如果玩家选择，被救的幸存者可以拒绝救援并留在原区域。"
+            },
+            {
+                name: "低调行事",
+                desc: "幸存者不会被友军伤害击中（燃烧瓶规则仍然适用）。当向他们所在的区域射击时，忽略他们。"
+            },
+            {
+                name: "幸运",
+                desc: "对于幸存者采取的每个行动，玩家可以选择重投所有骰子一次。新的结果将取代之前的结果。此技能与允许重投的装备效果叠加。"
+            },
+            {
+                name: "天生一对",
+                desc: "当幸存者执行搜索行动并抽到一张带有“双持”符号的装备卡时，他们可以立即从装备牌堆中拿取第二张同类型的卡。之后洗混牌堆。"
+            },
+            {
+                name: "医生",
+                desc: "此技能在每个结束阶段免费使用。该幸存者以及站在同一区域的所有其他幸存者可以治疗 1 点伤害（最少 0 点伤害）。每以此方式治疗 1 点伤害，该幸存者获得 1 点肾上腺素（AP）。"
+            },
+            {
+                name: "近距离击杀",
+                desc: "幸存者可以在自己的区域内执行远程行动，无论最小射程是多少。当在射程 0 结算远程行动时，幸存者自由选择目标并可以消灭任何类型的丧尸（无论它们有什么特殊能力）。他们的远程武器仍然需要造成足够的伤害来消灭目标。友军伤害被忽略。"
+            },
+            {
+                name: "收割：[行动]",
+                desc: "此技能可在使用指定类型（战斗、近战或远程）的行动分配命中时使用。其中 1 次命中可以免费消灭一个额外的相同类型的丧尸。使用此技能时，每次行动只能消灭一个额外的丧尸。幸存者获得额外丧尸的肾上腺素。"
+            },
+            {
+                name: "再生",
+                desc: "在每个结束阶段，幸存者的生命值完全恢复到最大值。"
+            },
+            {
+                name: "掷出 6：+1 伤害 [行动]",
+                desc: "在使用指定类型（战斗、近战或远程）的行动中，每掷出一个 6，该幸存者使用的武器伤害值就增加 1。在确定此技能赋予的伤害加成之前，必须先使用允许重投的游戏效果。"
+            },
+            {
+                name: "掷出 6：+1 骰子 [行动]",
+                desc: "在使用指定类型（战斗、近战或远程）的行动中，每掷出一个 6，就可以额外掷一颗骰子。只要玩家持续掷出 6，就可以继续掷额外的骰子。在为此技能掷任何额外骰子之前，必须先使用允许重投的游戏效果。"
+            },
+            {
+                name: "拾荒者",
+                desc: "幸存者可以在任何建筑物或街道区域进行搜索。正常的搜索规则适用（例如，不能在有丧尸的区域搜索）。"
+            },
+            {
+                name: "搜索：2 张卡牌",
+                desc: "当该幸存者进行搜索时，抽取 2 张卡牌。"
+            },
+            {
+                name: "猛撞",
+                desc: "幸存者每回合可以使用此技能一次，免费。选择一个距离该幸存者射程 1的区域。两个区域之间必须有清晰的路径。站在该幸存者区域内的所有丧尸被推到所选区域。这不是移动。"
+            },
+            {
+                name: "侧步",
+                desc: "每当有任何丧尸在 0-1 射程内生成时（且在任何“突袭”之前），幸存者可以立即执行一次免费的移动行动。如果他们所在的区域有丧尸，幸存者执行此免费移动行动不花费额外行动点。每抽一张丧尸卡，幸存者可以使用此技能一次。"
+            },
+            {
+                name: "滑行",
+                desc: "当幸存者从一个包含丧尸的区域执行移动行动离开时，不花费额外的行动点。幸存者在执行移动行动时也忽略丧尸（包括那些允许他们穿过多个区域的技能，例如“冲刺”）。"
+            },
+            {
+                name: "狙击手",
+                desc: "幸存者可以自由选择所有远程行动的目标。忽略友军伤害。"
+            },
+            {
+                name: "疾跑",
+                desc: "幸存者每回合可以使用此技能一次。该幸存者花费 1 个移动行动：他们可以移动 2 或 3 个区域，而不是 1 个。进入一个包含丧尸的区域仍然会结束幸存者的移动行动。"
+            },
+            {
+                name: "初始生命值 [X]",
+                desc: "幸存者以指示的生命值量开始游戏。这是他们的基础等级。注：拥有此技能的幸存者不能用作同伴。"
+            },
+            {
+                name: "初始 2 点肾上腺素",
+                desc: "幸存者以 2 点肾上腺素开始游戏。 注：拥有此技能的幸存者不能用作同伴。"
+            },
+            {
+                name: "初始装备 [装备]",
+                desc: "幸存者以指示的装备开始游戏。该卡在设置期间自动分配给他们。 注：拥有此技能的幸存者不能用作同伴。"
+            },
+            {
+                name: "稳定之手",
+                desc: "当远程行动未命中时，幸存者可以选择忽略其他幸存者。此技能不适用于杀死目标区域内所有东西的游戏效果（例如燃烧瓶）。"
+            },
+            {
+                name: "大力士",
+                desc: "将幸存者使用的近战武器的伤害值视为 3。"
+            },
+            {
+                name: "剑圣",
+                desc: "该幸存者将所有近战武器视为拥有“双持”符号。"
+            },
+            {
+                name: "战术家",
+                desc: "该幸存者的回合可以在玩家阶段的任何时候结算，在任何其他幸存者的回合之前或之后。如果有多位幸存者拥有此技能，玩家选择他们的回合顺序。"
+            },
+            {
+                name: "嘲讽",
+                desc: "幸存者每回合可以免费使用此技能一次。选择一个距离幸存者最多 2 个区域且通向幸存者有清晰路径的区域。站在所选区域内的所有丧尸立即获得一次额外激活。它们会尽一切可能试图到达嘲讽的幸存者身边，无视其他幸存者。"
+            },
+            {
+                name: "坚韧",
+                desc: "幸存者忽略他们在每个攻击步骤（丧尸阶段）和友军伤害（幸存者远程行动）期间受到的第一次伤害。"
+            },
+            {
+                name: "一网在手",
+                desc: "幸存者物品栏中的所有装备都被视为已装备在手上。"
+            },
+            {
+                name: "丧尸链接",
+                desc: "每当从丧尸牌堆中抽出一张额外激活卡（不是突袭）时，该幸存者可以进行一个额外的回合。他们在被额外激活的丧尸之前行动。如果有多位幸存者同时受益于此技能，玩家选择他们的回合顺序。"
+            }
+        ];
+
+        // 变量初始化
         const allExpansions = [...new Set(deckData.map(card => card.expansion))];
         let activeExpansions = new Set(allExpansions);
         
         let filteredDeck = [];
         let drawPile = [];
-        
         let pendingCard = null;
         let pendingCardIndex = -1;
         let rarityType = 'common';
         let isMuted = false;
-        
-        // 🚨 关键状态锁
         let isProcessing = false; 
         let isFlipped = false;
 
+        // 技能书分页
+        let skillPage = 0;
+        const skillsPerPage = 9;
+
+        // 音频缓存
+        const audioCache = {}; 
+        const audioMap = { 'common': '../audio/common.mp3', 'rare': '../audio/rare.mp3', 'epic': '../audio/epic.mp3', 'legendary': '../audio/legendary.mp3', 'golden': '../audio/golden.mp3' };
+
+        // DOM 元素
+        const views = {
+            'view-menu': document.getElementById('view-menu'),
+            'view-draw': document.getElementById('view-draw'),
+            'view-skills': document.getElementById('view-skills')
+        };
         const wrapper = document.getElementById('interactionWrapper');
         const cardElement = document.getElementById('gameCard');
         const returnBtn = document.getElementById('returnBtn');
@@ -533,7 +825,6 @@
         const burstLayer = document.getElementById('burstLayer'); 
         const soundToggle = document.getElementById('soundToggle');
         const filterMenu = document.getElementById('filterMenu');
-
         const imgEl = document.getElementById('cardImage');
         const nameEl = document.getElementById('infoName');
         const hpEl = document.getElementById('infoHp');
@@ -545,7 +836,16 @@
         window.addEventListener('DOMContentLoaded', () => {
             initFilterMenu();
             manualReshuffle();
+            preloadImages();
+            preloadAudio();
+            renderSkills(); // 渲染第一页技能
         });
+
+        // === 🆕 视图切换 ===
+        window.switchView = function(viewId) {
+            Object.values(views).forEach(el => el.classList.remove('active-view'));
+            views[viewId].classList.add('active-view');
+        };
 
         // 绑定洗牌
         mainReshuffleBtn.addEventListener('click', (e) => {
@@ -582,42 +882,53 @@
             });
         }
 
+        // 图片预加载
+        function preloadImages() {
+            deckData.forEach(card => {
+                const img = new Image();
+                img.src = card.image;
+            });
+        }
+
+        // 音频预加载
+        function preloadAudio() {
+            for (let key in audioMap) {
+                const audio = new Audio();
+                audio.src = audioMap[key];
+                audio.preload = 'auto';
+                audio.load();
+                audioCache[key] = audio;
+            }
+        }
+
         // 手动洗牌
         function manualReshuffle() {
             filteredDeck = deckData.filter(card => activeExpansions.has(card.expansion));
             drawPile = [...filteredDeck];
             console.log("Deck Reset. Count:", drawPile.length);
-            
-            // 重置状态
             isFlipped = false;
             isProcessing = false;
             cardElement.classList.remove('is-flipped');
             wrapper.classList.remove('active');
-            
-            // 准备第一张
             prepareNextCard();
         }
 
         // 准备下一张
         function prepareNextCard() {
             updateCounter();
-
             if (drawPile.length === 0) {
                 cardElement.classList.add('is-empty');
                 cardElement.setAttribute('data-rarity', 'empty');
                 pendingCard = null;
                 return;
             }
-
             cardElement.classList.remove('is-empty');
-
-            // 仅仅为了设置背面的光效颜色，此时不决定具体抽哪张
             const peekIndex = Math.floor(Math.random() * drawPile.length);
             const peekCard = drawPile[peekIndex];
             setRarityColor(peekCard);
         }
 
-        // 设置光效辅助函数
+        // 设置光效
         function setRarityColor(card) {
             rarityType = 'common';
             const typeStr = card.type || "";
@@ -631,50 +942,31 @@
             burstLayer.style.setProperty('--rarity-color', getComputedStyle(document.documentElement).getPropertyValue(`--color-${rarityType}`));
         }
 
-        // === 核心：点击抽卡 (带严格防抖锁) ===
+        // === 点击抽卡 ===
         cardElement.addEventListener('click', function(e) {
-            // 1. 严格检查状态
             if (isFlipped || isProcessing || drawPile.length === 0) return;
-            
-            // 2. 上锁
             isProcessing = true;
-
-            // 3. 正式抽取：随机选一张
             const finalIndex = Math.floor(Math.random() * drawPile.length);
             const finalCard = drawPile[finalIndex];
-            
-            // 4. 从数组移除 (Splice)
             drawPile.splice(finalIndex, 1);
-            
-            // 5. 渲染内容
             revealCard(finalCard);
-            setRarityColor(finalCard); // 确保翻开的光效和卡牌一致
-            
-            // 6. 翻转动画
+            setRarityColor(finalCard); 
             cardElement.classList.add('is-flipped');
             wrapper.classList.add('active'); 
-            
             triggerBurst();
             setTimeout(() => playRaritySound(rarityType), 200);
-            
             isFlipped = true;
-            isProcessing = false; // 解锁
-            
-            // 7. 立即更新计数器 (让用户看到少了1张)
+            isProcessing = false; 
             updateCounter();
         });
 
-        // === 返回按钮 (带防抖锁) ===
+        // === 返回按钮 ===
         returnBtn.addEventListener('click', function(e) {
             e.stopPropagation();
-            
             if (!isFlipped || isProcessing) return;
             isProcessing = true;
-
             cardElement.classList.remove('is-flipped');
             wrapper.classList.remove('active'); 
-            
-            // 等翻转动画结束再允许下一次点击
             setTimeout(() => {
                 isFlipped = false;
                 isProcessing = false;
@@ -683,8 +975,11 @@
         });
 
         function revealCard(card) {
+            imgEl.style.opacity = '0';
+            imgEl.style.transition = 'opacity 0.2s'; 
             imgEl.src = card.image;
-            imgEl.onerror = () => imgEl.src = 'https://via.placeholder.com/400x600?text=No+Image';
+            imgEl.onload = () => { imgEl.style.opacity = '1'; };
+            imgEl.onerror = () => { imgEl.src = 'https://via.placeholder.com/400x600?text=No+Image'; imgEl.style.opacity = '1'; };
             nameEl.innerText = card.name;
             hpEl.innerText = card.hp; 
             typeEl.innerText = card.type;
@@ -693,7 +988,6 @@
         }
 
         function updateCounter() {
-            // 显示：剩余张数 / 总数
             deckCounter.innerText = `${drawPile.length}/${filteredDeck.length}`;
         }
 
@@ -707,10 +1001,42 @@
 
         function playRaritySound(rarity) {
             if (isMuted) return;
-            const audioMap = { 'common': '../audio/common.mp3', 'rare': '../audio/rare.mp3', 'epic': '../audio/epic.mp3', 'legendary': '../audio/legendary.mp3', 'golden': '../audio/golden.mp3' };
-            const audioFile = audioMap[rarity];
-            if (audioFile) { const audio = new Audio(audioFile); audio.volume = 0.8; audio.play().catch(e => console.log("Audio play failed:", e)); }
+            const audio = audioCache[rarity];
+            if (audio) {
+                audio.currentTime = 0; 
+                audio.volume = 0.8;
+                audio.play().catch(e => { console.log("Audio play prevented:", e); });
+            }
         }
+
+        // === 🆕 技能书逻辑 ===
+        window.renderSkills = function() {
+            const grid = document.getElementById('skillGrid');
+            grid.innerHTML = ""; 
+            const start = skillPage * skillsPerPage;
+            const end = start + skillsPerPage;
+            const pageSkills = skillsData.slice(start, end);
+
+            pageSkills.forEach(skill => {
+                const cell = document.createElement('div');
+                cell.className = 'skill-cell';
+                cell.innerHTML = `
+                    <div class="skill-title">${skill.name}</div>
+                    <div class="skill-desc">${skill.desc}</div>
+                `;
+                grid.appendChild(cell);
+            });
+
+            document.getElementById('skillUpBtn').classList.toggle('hidden', skillPage === 0);
+            document.getElementById('skillDownBtn').classList.toggle('hidden', end >= skillsData.length);
+        };
+
+        window.scrollSkills = function(direction) {
+            skillPage += direction;
+            if (skillPage < 0) skillPage = 0;
+            renderSkills();
+        };
+
     </script>
 </body>
 </html>
