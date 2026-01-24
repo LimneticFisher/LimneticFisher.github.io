@@ -3,20 +3,15 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Zombicide Ultimate FX</title>
+    <title>Zombicide Pro Deck</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Noto+Serif+SC:ital,wght@1,700&family=Permanent+Marker&family=ZCOOL+QingKe+HuangYou&display=swap" rel="stylesheet">
     
     <style>
         :root {
-            /* === 桌面端默认参数 (大屏) === */
             --card-width: 44vh;
             --card-height: 62vh;
-            --info-width: 360px;
-            --font-hp: 6rem;
-            --font-name: 3rem;
-            --font-desc: 1.4rem;
             
             --hazard-yellow: #f1c40f;
             --hazard-black: #111;
@@ -36,30 +31,6 @@
             --color-golden: #fbc531;
         }
 
-        /* === 📱 平板/小笔记本适配 === */
-        @media (max-width: 1200px) {
-            :root {
-                --card-width: 35vh;
-                --card-height: 50vh;
-                --info-width: 300px;
-                --font-hp: 4.5rem;
-                --font-name: 2.2rem;
-                --font-desc: 1.1rem;
-            }
-        }
-
-        /* === 📱 手机/竖屏平板适配 === */
-        @media (max-width: 768px) {
-            :root {
-                --card-width: 60vw; 
-                --card-height: 85vw; 
-                --info-width: 85vw;  
-                --font-hp: 4rem;
-                --font-name: 2rem;
-                --font-desc: 1rem;
-            }
-        }
-
         body {
             background-color: var(--bg-dark);
             background-image: radial-gradient(circle at center, #1e1e1e 0%, #000 80%);
@@ -70,20 +41,21 @@
             display: flex; flex-direction: column;
         }
 
+        /* 顶部底部条 */
         .hazard-bar {
-            height: 30px; width: 100%;
+            height: 40px; width: 100%;
             background: var(--stripe-pattern);
             box-shadow: 0 0 20px rgba(0,0,0,0.8);
             z-index: 100;
         }
-        .hazard-bar.top { border-bottom: 4px solid #000; }
-        .hazard-bar.bottom { border-top: 4px solid #000; }
+        .hazard-bar.top { border-bottom: 5px solid #000; }
+        .hazard-bar.bottom { border-top: 5px solid #000; }
 
+        /* 舞台 */
         .stage-center {
             flex: 1;
             display: flex; align-items: center; justify-content: center;
             perspective: 1500px; position: relative;
-            padding-bottom: 40px;
         }
 
         /* 光爆层 */
@@ -108,97 +80,58 @@
         .burst-layer.active .burst-core { animation: anim-core 0.8s cubic-bezier(0.1, 0.9, 0.2, 1) forwards; }
         .burst-layer.active .burst-glow { animation: anim-glow 1.2s ease-out forwards; }
         .burst-layer.active .burst-ring { animation: anim-ring 0.6s cubic-bezier(0, 0.9, 0.57, 1) forwards; }
-        
-        @keyframes anim-core { 0% { width: 0; height: 0; opacity: 1; } 30% { opacity: 1; } 100% { width: 120vmin; height: 120vmin; opacity: 0; } }
-        @keyframes anim-glow { 0% { width: 0; height: 0; opacity: 0.8; } 100% { width: 150vmax; height: 150vmax; opacity: 0; } }
-        @keyframes anim-ring { 0% { width: 0; height: 0; opacity: 0; border-width: 20px; } 10% { opacity: 1; } 100% { width: 120vmin; height: 120vmin; opacity: 0; border-width: 0px; } }
+        @keyframes anim-core { 0% { width: 0; height: 0; opacity: 1; } 30% { opacity: 1; } 100% { width: 150vh; height: 150vh; opacity: 0; } }
+        @keyframes anim-glow { 0% { width: 0; height: 0; opacity: 0.8; } 100% { width: 200vw; height: 200vw; opacity: 0; } }
+        @keyframes anim-ring { 0% { width: 0; height: 0; opacity: 0; border-width: 20px; } 10% { opacity: 1; } 100% { width: 140vh; height: 140vh; opacity: 0; border-width: 0px; } }
 
-        /* === 交互容器 === */
+        /* 交互容器 */
         .interaction-container {
             display: flex; align-items: center; justify-content: center;
             width: var(--card-width); height: var(--card-height);
             transition: all 0.6s cubic-bezier(0.23, 1, 0.32, 1);
             position: relative; z-index: 10;
         }
-
-        /* 桌面端/平板悬停展开 - 【关键修复】 */
-        @media (min-width: 769px) {
-            .interaction-container.active:hover { 
-                width: calc(var(--card-width) + var(--info-width) + 60px); 
-            }
-            .interaction-container.active:hover .scene { 
-                transform: rotate(-3deg) translateX(-60px) scale(1.1); 
-            }
-            .interaction-container.active:hover .info-panel { 
-                margin-left: 60px; 
-                opacity: 1; 
-                transform: translateX(0) translateZ(0); 
-                pointer-events: auto; /* <--- 修复点：桌面端必须要加这个，否则点不动 */
-            }
-        }
-
-        /* === 📱 手机端特殊布局 - 【关键修复】 === */
-        @media (max-width: 768px) {
-            .interaction-container {
-                flex-direction: column; 
-                height: auto; 
-            }
-            
-            .interaction-container.active .scene {
-                transform: scale(0.65) translateY(-20px); 
-                margin-bottom: -80px; 
-            }
-            
-            .interaction-container.active .info-panel {
-                margin-left: 0; 
-                margin-top: 20px;
-                opacity: 1; 
-                transform: translateY(0); 
-                pointer-events: auto; /* <--- 修复点：确保手机端也是可点击的 */
-                position: relative;
-                z-index: 100; /* <--- 修复点：大幅提高层级，防止被卡牌遮挡 */
-            }
-            
-            .reshuffle-container {
-                top: 105% !important; 
-            }
-        }
-
+        /* 当牌翻开时，宽度变宽以容纳信息栏 */
+        .interaction-container.active:hover { width: calc(var(--card-width) + 420px); }
         .scene {
             width: var(--card-width); height: var(--card-height);
             position: relative; transition: transform 0.6s cubic-bezier(0.23, 1, 0.32, 1);
-            flex-shrink: 0; 
         }
+        .interaction-container.active:hover .scene { transform: rotate(-3deg) translateX(-60px) scale(1.1); }
 
         /* 卡牌 */
         .card {
             width: 100%; height: 100%; position: relative;
             transition: transform 0.6s cubic-bezier(0.68, -0.55, 0.265, 1.55);
-            transform-style: preserve-3d; cursor: pointer; border-radius: 16px;
+            transform-style: preserve-3d; cursor: pointer; border-radius: 20px;
         }
         .card.is-flipped { transform: rotateY(180deg); }
+        
+        /* 牌堆耗尽状态 */
         .card.is-empty { cursor: not-allowed; filter: grayscale(100%); opacity: 0.7; }
         
+        /* 卡背流光 */
         .card:not(.is-empty)::before {
-            content: ''; position: absolute; top: -15px; left: -15px; right: -15px; bottom: -15px;
-            background: var(--rarity-color); z-index: -1; filter: blur(20px); opacity: 0;
-            transition: opacity 0.5s ease; border-radius: 30px;
+            content: ''; position: absolute; top: -20px; left: -20px; right: -20px; bottom: -20px;
+            background: var(--rarity-color); z-index: -1; filter: blur(30px); opacity: 0;
+            transition: opacity 0.5s ease; border-radius: 40px;
         }
         .card:not(.is-flipped):not(.is-empty):hover::before { opacity: 0.4; }
         
+        /* 变量绑定 */
         .card[data-rarity="common"] { --rarity-color: var(--color-common); }
         .card[data-rarity="rare"] { --rarity-color: var(--color-rare); }
         .card[data-rarity="epic"] { --rarity-color: var(--color-epic); }
         .card[data-rarity="legendary"] { --rarity-color: var(--color-legendary); }
         .card[data-rarity="golden"] { --rarity-color: var(--color-golden); }
-        .card[data-rarity="empty"] { --rarity-color: #555; }
+        .card[data-rarity="empty"] { --rarity-color: #555; } /* 空牌堆颜色 */
 
         .card__face {
             position: absolute; width: 100%; height: 100%;
             -webkit-backface-visibility: hidden; backface-visibility: hidden;
-            border-radius: 16px; overflow: hidden;
-            border: 4px solid #000; background-color: #000;
-            box-shadow: inset 0 0 20px rgba(0,0,0,0.8); 
+            border-radius: 20px; overflow: hidden;
+            border: 5px solid #000; background-color: #000;
+            box-shadow: inset 0 0 30px rgba(0,0,0,0.8); 
         }
         .card__face--front { 
             background-color: #8E2F39; 
@@ -206,8 +139,9 @@
             background-size: cover; background-position: center; 
             display: flex; align-items: center; justify-content: center;
         }
+        /* 空牌堆提示字 */
         .empty-msg {
-            display: none; font-size: 1.8rem; color: #fff; text-shadow: 0 0 10px #000;
+            display: none; font-size: 2rem; color: #fff; text-shadow: 0 0 10px #000;
             transform: rotate(-15deg); border: 4px solid #fff; padding: 10px 20px;
         }
         .card.is-empty .empty-msg { display: block; }
@@ -227,142 +161,125 @@
             background: var(--stripe-pattern);
             -webkit-mask: linear-gradient(#fff, #fff) content-box, linear-gradient(#fff, #fff);
             -webkit-mask-composite: xor; mask-composite: exclude;
-            padding: 12px; pointer-events: none;
+            padding: 15px; pointer-events: none;
         }
         .card-image-full { width: 100%; height: 100%; object-fit: cover; }
 
         /* === 信息栏 === */
         .info-panel {
-            width: var(--info-width);
-            margin-left: calc(var(--info-width) * -1); /* 初始隐藏在左侧 */
-            opacity: 0;
-            transform: translateX(30px) translateZ(-100px);
-            display: flex; flex-direction: column; gap: 20px;
+            width: 360px; margin-left: -360px; opacity: 0;
+            transform: translateX(50px) translateZ(-100px);
+            display: flex; flex-direction: column; gap: 30px;
             z-index: 1; transition: all 0.6s cubic-bezier(0.23, 1, 0.32, 1);
-            
-            /* ⚠️ 核心：默认不响应鼠标，只有 active 时才响应 */
-            pointer-events: none; 
+            pointer-events: none;
         }
-        
+        .interaction-container.active:hover .info-panel { margin-left: 60px; opacity: 1; transform: translateX(0) translateZ(0); pointer-events: auto; }
         .info-box {
-            position: relative; background: rgba(0,0,0,0.9); padding: 15px 20px;
+            position: relative; background: rgba(0,0,0,0.9); padding: 20px 25px;
             color: var(--hazard-yellow); text-align: center;
             border: 4px solid transparent; background-clip: padding-box;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.6);
+            box-shadow: 0 15px 40px rgba(0,0,0,0.6);
         }
         .info-box::before {
             content: ''; position: absolute; top: -4px; bottom: -4px; left: -4px; right: -4px;
             background: var(--stripe-pattern); z-index: -1; border-radius: 6px;
         }
-        
-        .info-title-box { display: flex; justify-content: center; align-items: center; min-height: 60px; position: relative; overflow: visible; }
-        .info-name { 
-            font-family: 'ZCOOL QingKe HuangYou', sans-serif; 
-            font-size: var(--font-name); 
-            letter-spacing: 2px; text-shadow: 3px 3px 0 #000; 
-        }
+        .info-title-box { display: flex; justify-content: center; align-items: center; min-height: 70px; position: relative; overflow: visible; }
+        .info-name { font-family: 'ZCOOL QingKe HuangYou', sans-serif; font-size: 3rem; letter-spacing: 4px; text-shadow: 4px 4px 0 #000; }
         .hp-badge {
-            position: absolute; top: -40px; right: -20px;
-            font-family: 'Permanent Marker', cursive; 
-            font-size: var(--font-hp);
-            color: #000; -webkit-text-stroke: 3px var(--hazard-yellow);
-            filter: drop-shadow(4px 4px 0px rgba(0,0,0,0.6)); transform: rotate(15deg); z-index: 10; pointer-events: none;
+            position: absolute; top: -50px; right: -30px;
+            font-family: 'Permanent Marker', cursive; font-size: 6rem;
+            color: #000; -webkit-text-stroke: 4px var(--hazard-yellow);
+            filter: drop-shadow(5px 5px 0px rgba(0,0,0,0.6)); transform: rotate(15deg); z-index: 10; pointer-events: none;
         }
-        
-        .info-desc-box { 
-            text-align: left; 
-            font-size: var(--font-desc); 
-            line-height: 1.5; text-shadow: 2px 2px 0 #000; font-family: 'ZCOOL QingKe HuangYou', sans-serif; 
-        }
-        .type-tag { 
-            display: inline-block; background: var(--hazard-yellow); color: #000; font-family: 'ZCOOL QingKe HuangYou', sans-serif; 
-            padding: 4px 10px; border-radius: 4px; margin-bottom: 10px; 
-            font-size: 1rem; letter-spacing: 1px; box-shadow: 3px 3px 0 rgba(0,0,0,0.5); transform: rotate(-2deg); text-shadow: none; 
-        }
+        .info-desc-box { text-align: left; font-size: 1.4rem; line-height: 1.6; text-shadow: 2px 2px 0 #000; font-family: 'ZCOOL QingKe HuangYou', sans-serif; }
+        .type-tag { display: inline-block; background: var(--hazard-yellow); color: #000; font-family: 'ZCOOL QingKe HuangYou', sans-serif; padding: 6px 14px; border-radius: 6px; margin-bottom: 15px; font-size: 1.2rem; letter-spacing: 2px; box-shadow: 3px 3px 0 rgba(0,0,0,0.5); transform: rotate(-2deg); text-shadow: none; }
         
         .info-flavor-box {
             font-family: 'Noto Serif SC', serif; font-style: italic; font-weight: 700;
-            font-size: 1rem; color: #eee; text-align: left; line-height: 1.6;
-            min-height: 60px; display: flex; flex-direction: column; justify-content: space-between;
+            font-size: 1.1rem; color: #eee; text-align: left; line-height: 1.7;
+            min-height: 80px; display: flex; flex-direction: column; justify-content: space-between;
         }
         .flavor-text { margin-bottom: 10px; opacity: 0.95; text-shadow: 1px 1px 0 #000; }
         
+        /* 底部操作区 (返回 + 计数) */
         .card-actions {
             display: flex; align-items: center; justify-content: center; gap: 15px;
             padding-top: 10px; border-top: 2px dashed rgba(255,255,255,0.2);
         }
-        .return-btn { cursor: pointer; font-size: 2.2rem; color: var(--hazard-yellow); transition: transform 0.2s; }
+        .return-btn { cursor: pointer; font-size: 2.5rem; color: var(--hazard-yellow); transition: transform 0.2s; }
         .return-btn:hover { transform: scale(1.2) rotate(-20deg); color: #fff; }
         
         .deck-counter {
-            font-family: 'Permanent Marker', cursive; font-size: 1.3rem; color: #fff;
+            font-family: 'Permanent Marker', cursive; font-size: 1.5rem; color: #fff;
             background: #000; padding: 2px 8px; border-radius: 4px; border: 1px solid var(--hazard-yellow);
             transform: rotate(5deg);
         }
 
-        /* 按钮组件 */
+        /* === 按钮组件 === */
         .action-btn {
             background: #000; color: var(--hazard-yellow); border: 2px solid var(--hazard-yellow);
-            padding: 8px; border-radius: 50%; cursor: pointer; opacity: 0.7; transition: all 0.3s;
+            padding: 10px; border-radius: 50%; cursor: pointer; opacity: 0.6; transition: all 0.3s;
             display: flex; align-items: center; justify-content: center;
         }
         .action-btn:hover { opacity: 1; transform: scale(1.1); box-shadow: 0 0 15px var(--hazard-yellow); }
-        .action-btn svg { width: 22px; height: 22px; display: block; }
+        .action-btn svg { width: 24px; height: 24px; display: block; }
 
-        .sound-toggle { position: fixed; bottom: 80px; left: 20px; z-index: 200; }
+        .sound-toggle { position: fixed; bottom: 50px; left: 20px; z-index: 200; }
         .sound-off-icon { display: none; }
         .sound-toggle.muted .sound-on-icon { display: none; }
         .sound-toggle.muted .sound-off-icon { display: block; }
 
-        /* 洗牌按钮 */
+        /* === 🆕 洗牌按钮 (居中显示在卡牌下方) === */
         .reshuffle-container {
             position: absolute; top: 110%; left: 50%; transform: translateX(-50%);
             z-index: 20; opacity: 0; pointer-events: none; transition: opacity 0.3s;
         }
+        /* 仅在未翻开且牌堆不为空时显示，或者牌堆空时显示 */
         .interaction-container:not(.active) .reshuffle-container { opacity: 1; pointer-events: auto; }
         
         .reshuffle-btn {
             background: var(--hazard-yellow); color: #000; border: none;
-            font-family: 'ZCOOL QingKe HuangYou', sans-serif; font-size: 1.3rem;
-            padding: 8px 20px; clip-path: polygon(10% 0, 100% 0, 90% 100%, 0% 100%);
+            font-family: 'ZCOOL QingKe HuangYou', sans-serif; font-size: 1.5rem;
+            padding: 8px 25px; clip-path: polygon(10% 0, 100% 0, 90% 100%, 0% 100%);
             cursor: pointer; box-shadow: 0 5px 15px rgba(0,0,0,0.5);
-            transition: transform 0.2s; white-space: nowrap;
+            transition: transform 0.2s;
         }
         .reshuffle-btn:hover { transform: scale(1.1); color: #fff; background: #d35400; }
         .reshuffle-btn:active { transform: scale(0.95); }
 
-        /* 扩展包过滤器 */
+        /* === 扩展包过滤器 === */
         .filter-wrapper {
-            position: fixed; bottom: 40px; right: 15px; z-index: 300;
+            position: fixed; bottom: 50px; right: 20px; z-index: 300;
             display: flex; flex-direction: column; align-items: flex-end;
         }
         .filter-icon {
-            width: auto; height: auto; max-width: 80px; max-height: 80px;
+            width: auto; height: auto; max-width: 100px; max-height: 100px;
             cursor: pointer; filter: drop-shadow(0 4px 6px rgba(0,0,0,0.5));
             transition: transform 0.3s;
         }
         .filter-wrapper:hover .filter-icon { transform: scale(1.1) rotate(-10deg); }
         .filter-menu {
-            position: absolute; bottom: 75px; right: 0; width: 180px;
-            background: rgba(0,0,0,0.95); border: 2px solid var(--hazard-yellow);
-            padding: 10px; box-shadow: 0 10px 30px rgba(0,0,0,0.8);
+            position: absolute; bottom: 85px; right: 0; width: 200px;
+            background: rgba(0,0,0,0.95); border: 3px solid var(--hazard-yellow);
+            padding: 15px; box-shadow: 0 10px 30px rgba(0,0,0,0.8);
             opacity: 0; visibility: hidden; transform: translateY(20px) scale(0.9);
             transition: all 0.3s;
             background-image: repeating-linear-gradient(45deg, rgba(241,196,15,0.05) 0, rgba(241,196,15,0.05) 10px, transparent 10px, transparent 20px);
         }
         .filter-wrapper:hover .filter-menu { opacity: 1; visibility: visible; transform: translateY(0) scale(1); }
         .menu-title {
-            color: var(--hazard-yellow); font-size: 1.1rem; margin-bottom: 8px;
-            border-bottom: 1px dashed rgba(241, 196, 15, 0.3); padding-bottom: 4px; text-align: center;
+            color: var(--hazard-yellow); font-size: 1.2rem; margin-bottom: 10px;
+            border-bottom: 2px dashed rgba(241, 196, 15, 0.3); padding-bottom: 5px; text-align: center;
         }
-        .filter-item { display: flex; align-items: center; margin-bottom: 6px; cursor: pointer; color: #fff; font-size: 0.95rem; transition: color 0.2s; }
+        .filter-item { display: flex; align-items: center; margin-bottom: 8px; cursor: pointer; color: #fff; font-size: 1rem; transition: color 0.2s; }
         .filter-item:hover { color: var(--hazard-yellow); }
         .filter-checkbox {
-            appearance: none; -webkit-appearance: none; width: 16px; height: 16px;
-            border: 2px solid var(--hazard-yellow); background: transparent; margin-right: 8px; position: relative; cursor: pointer;
+            appearance: none; -webkit-appearance: none; width: 18px; height: 18px;
+            border: 2px solid var(--hazard-yellow); background: transparent; margin-right: 10px; position: relative; cursor: pointer;
         }
         .filter-checkbox:checked { background: var(--hazard-yellow); }
-        .filter-checkbox:checked::after { content: '✔'; position: absolute; color: #000; font-size: 12px; font-weight: bold; top: -2px; left: 1px; }
+        .filter-checkbox:checked::after { content: '✔'; position: absolute; color: #000; font-size: 14px; font-weight: bold; top: -2px; left: 2px; }
 
     </style>
 </head>
@@ -521,7 +438,7 @@
         let rarityType = 'common';
         let isMuted = false;
         
-        // 🚨 关键状态锁
+        // 🚨 关键状态锁：防止重复点击和双重触发
         let isProcessing = false; 
         let isFlipped = false;
 
@@ -598,7 +515,7 @@
             prepareNextCard();
         }
 
-        // 准备下一张
+        // 准备下一张 (仅预览光效，不锁死卡牌)
         function prepareNextCard() {
             updateCounter();
 
@@ -612,6 +529,8 @@
             cardElement.classList.remove('is-empty');
 
             // 仅仅为了设置背面的光效颜色，此时不决定具体抽哪张
+            // 我们随机取一张来看看它的类型，用来设置呼吸灯颜色
+            // 真正的“抽取”动作延迟到点击时
             const peekIndex = Math.floor(Math.random() * drawPile.length);
             const peekCard = drawPile[peekIndex];
             setRarityColor(peekCard);
@@ -623,7 +542,7 @@
             const typeStr = card.type || "";
             if (typeStr.includes('未分级')) rarityType = 'golden';
             else if (typeStr.includes('憎恶')) rarityType = 'legendary';
-            else if (typeStr.includes('硕')) rarityType = 'epic';
+            else if (typeStr.includes('硕尸')) rarityType = 'epic';
             else if (typeStr.includes('疾行')) rarityType = 'rare';
             else rarityType = 'common';
             
