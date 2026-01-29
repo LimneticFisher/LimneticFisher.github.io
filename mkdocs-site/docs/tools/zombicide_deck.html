@@ -919,18 +919,24 @@
             prepareNextCard();
         }
 
-        // 准备下一张
+       // 准备下一张
         function prepareNextCard() {
             updateCounter();
+
             if (drawPile.length === 0) {
                 cardElement.classList.add('is-empty');
                 cardElement.setAttribute('data-rarity', 'empty');
-                pendingCard = null;
+                pendingCardIndex = -1; // 重置索引
                 return;
             }
+
             cardElement.classList.remove('is-empty');
-            const peekIndex = Math.floor(Math.random() * drawPile.length);
-            const peekCard = drawPile[peekIndex];
+
+            // 🟢 修改点：在这里直接决定下一张抽什么，并存入全局变量 pendingCardIndex
+            // 这样卡背的光效和接下来点开的内容就绝对一致了
+            pendingCardIndex = Math.floor(Math.random() * drawPile.length);
+            const peekCard = drawPile[pendingCardIndex];
+            
             setRarityColor(peekCard);
         }
 
@@ -948,21 +954,38 @@
             burstLayer.style.setProperty('--rarity-color', getComputedStyle(document.documentElement).getPropertyValue(`--color-${rarityType}`));
         }
 
-        // === 点击抽卡 ===
+        // === 核心：点击抽卡 (修复版) ===
         cardElement.addEventListener('click', function(e) {
-            if (isFlipped || isProcessing || drawPile.length === 0) return;
+            // 1. 严格检查状态
+            // 增加检查 pendingCardIndex 是否有效，防止数组越界
+            if (isFlipped || isProcessing || drawPile.length === 0 || pendingCardIndex === -1) return;
+            
+            // 2. 上锁
             isProcessing = true;
-            const finalIndex = Math.floor(Math.random() * drawPile.length);
-            const finalCard = drawPile[finalIndex];
-            drawPile.splice(finalIndex, 1);
+
+            // 🟢 修改点：不再重新随机，而是直接使用 prepareNextCard 里锁定好的 pendingCardIndex
+            const finalCard = drawPile[pendingCardIndex];
+            
+            // 4. 从数组移除 (Splice)
+            // 因为 drawPile 移除了元素，所以不需要担心重复抽取，splice 会物理删除它
+            drawPile.splice(pendingCardIndex, 1);
+            
+            // 5. 渲染内容
             revealCard(finalCard);
+            // 再次确保光效一致（其实不加这行也行，因为背面已经对了，但加上更保险）
             setRarityColor(finalCard); 
+            
+            // 6. 翻转动画
             cardElement.classList.add('is-flipped');
             wrapper.classList.add('active'); 
+            
             triggerBurst();
             setTimeout(() => playRaritySound(rarityType), 200);
+            
             isFlipped = true;
-            isProcessing = false; 
+            isProcessing = false; // 解锁
+            
+            // 7. 立即更新计数器
             updateCounter();
         });
 
