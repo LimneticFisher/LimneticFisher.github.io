@@ -1,0 +1,158 @@
+<!-- custom_theme/main.html -->
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>My Docs</title>
+    <link rel="stylesheet" href="../css/style.css">
+</head>
+<body>
+    <header class="header">
+        <div class="header-container">
+            <a href=".." class="header-brand">My Docs</a>
+            
+            <div class="header-right-controls">
+                <button type="button" id="theme-toggle" title="切换日间/夜间模式">
+                    <svg id="icon-sun" xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24"><path fill="white" d="M12 7a5 5 0 1 0 5 5a5 5 0 0 0-5-5m0-2a7 7 0 1 1-7 7a7 7 0 0 1 7-7m-5 6.5a.5.5 0 0 0 0 1h1a.5.5 0 0 0 0-1zm9 0a.5.5 0 0 0 0 1h1a.5.5 0 0 0 0-1zM12 2.5a.5.5 0 0 0 0-1v-1a.5.5 0 0 0-1 0v1a.5.5 0 0 0 1 0m0 19a.5.5 0 0 0 0 1v1a.5.5 0 0 0 1 0v-1a.5.5 0 0 0-1 0m-8.1-2.9a.5.5 0 0 0 .35.15a.5.5 0 0 0 .35-.85l-.7-.7a.5.5 0 1 0-.7.7zm13.1 0a.5.5 0 0 0 .7 0l.7-.7a.5.5 0 0 0-.7-.7l-.7.7a.5.5 0 0 0 0 .7m-12.45-13a.5.5 0 0 0 .7 0l.7-.7a.5.5 0 1 0-.7-.7l-.7.7a.5.5 0 0 0 0 .7m13.1 0a.5.5 0 0 0 .35-.15a.5.5 0 0 0-.7-.7l-.7.7a.5.5 0 0 0 .35.85Z"/></svg>
+                    <svg id="icon-moon" class="hidden" xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24"><path fill="white" d="M12 2A9.91 9.91 0 0 0 9 2.46A10 10 0 0 1 9 22a10 10 0 0 1-5-1.2A10 10 0 1 0 12 2Z"/></svg>
+                </button>
+                 
+                <nav class="header-nav">
+                    <ul>
+                       
+                        <li class="">
+                           <a href="..">Home</a>
+                        </li>
+                       
+                        <li class="active">
+                           <a href="./">Resources</a>
+                        </li>
+                       
+                        <li class="">
+                           <a href="../game_tools/">Tools</a>
+                        </li>
+                       
+                    </ul>
+                </nav>
+            </div>
+        </div>
+    </header>
+
+    <main class="main-content">
+        <!-- 判断：如果是首页 -->
+        
+        <!-- 判断：如果不是首页（即资源页），只显示内容，不显示Footer -->
+        <div class="page-content-wrapper">
+            <!-- docs/resources.md -->
+
+<!-- ⬇️⬇️⬇️ 【在这里添加方案 A 背景代码】 ⬇️⬇️⬇️ -->
+<!-- 全屏背景层：固定在底部，不随滚动条移动 -->
+<div style="position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: -1; pointer-events: none;">
+    <!-- opacity: 0.15 让图片非常暗，只显示纹理，不干扰文字 -->
+    <!-- filter: grayscale(100%) 变成黑白，更有质感 -->
+    <img src="../images/dark.webp" style="width: 100%; height: 100%; object-fit: cover; opacity: 0.15; filter: grayscale(100%);">
+</div>
+<!-- ⬆️⬆️⬆️ 背景代码结束 ⬆️⬆️⬆️ -->
+
+<!-- padding: 上 右 下 左 -->
+<!-- 如果觉得现在的 80px 太靠上，可以改成 100px 或 120px -->
+<div style="padding: 80px 40px 20px 40px;">
+    <!-- 增加了 class="scroll-animate" 实现动画 -->
+    <!-- 增加了 opacity: 0 (初始隐藏，由动画控制显示) -->
+    <h1 class="scroll-animate" style="font-size: 3rem; font-family: 'Noto Serif SC', serif; margin-bottom: 10px; color: #ffffff; opacity: 0;">
+        资源指北
+    </h1>
+</div>
+
+<!-- 2. 资源网格容器 -->
+<div class="resources-container" style="padding: 0 40px 60px 40px;">
+
+    <!-- 第一部分：期刊数据库 -->
+    <h2 class="section-title scroll-animate">一、期刊数据库</h2>
+    <div class="resource-grid">
+
+        <a href="http://www.ncpssd.cn/" class="resource-card scroll-animate" target="_blank">
+            <div class="card-arrow">↗</div>
+            <div class="card-icon-box">
+                <!-- DuckDuckGo 图标源 -->
+                <img src="https://icons.duckduckgo.com/ip3/www.ncpssd.cn.ico" alt="icon">
+            </div>
+            <div class="card-content">
+                <h3>国家哲学社会科学文献中心</h3>
+                <p>学术文献资源库</p>
+            </div>
+        </a>
+
+        <a href="https://www.airitilibrary.com/" class="resource-card scroll-animate" target="_blank">
+            <div class="card-arrow">↗</div>
+            <div class="card-icon-box">
+                <img src="https://www.google.com/s2/favicons?domain=www.airitilibrary.com&sz=64" alt="icon">
+            </div>
+            <div class="card-content">
+                <h3>华艺台湾学术文献数据库</h3>
+                <p>台湾学术电子期刊及学位论文</p>
+            </div>
+        </a>
+
+        <a href="https://link.springer.com/" class="resource-card scroll-animate" target="_blank">
+            <div class="card-arrow">↗</div>
+            <div class="card-icon-box">
+                <img src="https://www.google.com/s2/favicons?domain=link.springer.com&sz=64" alt="icon">
+            </div>
+            <div class="card-content">
+                <h3>Springer Link</h3>
+                <p>综合性科技与医学电子期刊</p>
+            </div>
+        </a>
+
+    </div>
+
+    <!-- 第二部分：中国古代史 -->
+    <h2 class="section-title scroll-animate">二、中国古代史史料搜索</h2>
+    <div class="resource-grid">
+
+        <a href="https://www.nlc.cn/web/index.shtml" class="resource-card scroll-animate" target="_blank">
+            <div class="card-arrow">↗</div>
+            <div class="card-icon-box">
+                <img src="https://www.google.com/s2/favicons?domain=www.nlc.cn&sz=64" alt="icon">
+            </div>
+            <div class="card-content">
+                <h3>中国国家数字图书馆</h3>
+                <p>国家典籍博物馆，综合性数字资源</p>
+            </div>
+        </a>
+
+        <a href="https://fhac.com.cn/index.html" class="resource-card scroll-animate" target="_blank">
+            <div class="card-arrow">↗</div>
+            <div class="card-icon-box">
+                <img src="https://www.google.com/s2/favicons?domain=fhac.com.cn&sz=64" alt="icon">
+            </div>
+            <div class="card-content">
+                <h3>中国第一历史档案馆</h3>
+                <p>明清档案查阅</p>
+            </div>
+        </a>
+
+        <a href="https://ctext.org/zhs" class="resource-card scroll-animate" target="_blank">
+            <div class="card-arrow">↗</div>
+            <div class="card-icon-box">
+                <img src="https://www.google.com/s2/favicons?domain=ctext.org&sz=64" alt="icon">
+            </div>
+            <div class="card-content">
+                <h3>中国哲学书电子化计划</h3>
+                <p>最大的中国古代典籍数字化工程</p>
+            </div>
+        </a>
+
+    </div>
+
+</div>
+        </div>
+        
+    </main>
+
+    <script>var base_url = '..';</script>
+    <script src="../js/main.js" defer></script>
+</body>
+</html>
