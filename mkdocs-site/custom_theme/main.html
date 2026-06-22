@@ -31,11 +31,32 @@
 
     (function(){
         var KEY = 'site_auth_token';
+        var COOKIE_DAYS = 365; // cookie 保存天数
         var gate = document.getElementById('auth-gate');
 
-        // 已验证过的设备直接放行
-        if (localStorage.getItem(KEY) === AUTH_HASH) {
+        // 读取 cookie
+        function getCookie(name) {
+            var match = document.cookie.match(new RegExp('(^| )' + name + '=([^;]+)'));
+            return match ? match[2] : null;
+        }
+
+        // 写入 cookie（跨所有路径）
+        function setCookie(name, value, days) {
+            var d = new Date();
+            d.setTime(d.getTime() + days * 86400000);
+            document.cookie = name + '=' + value + ';expires=' + d.toUTCString() + ';path=/;SameSite=Lax';
+        }
+
+        // 检查是否已验证：localStorage 或 cookie 任一命中即放行
+        var authed = false;
+        try { authed = localStorage.getItem(KEY) === AUTH_HASH; } catch(e) {}
+        if (!authed) authed = getCookie(KEY) === AUTH_HASH;
+
+        if (authed) {
             gate.style.display = 'none';
+            // 双写确保两边都有
+            try { localStorage.setItem(KEY, AUTH_HASH); } catch(e) {}
+            setCookie(KEY, AUTH_HASH, COOKIE_DAYS);
         }
 
         async function sha256(str) {
@@ -47,7 +68,9 @@
             var input = document.getElementById('auth-pass');
             var hash = await sha256(input.value);
             if (hash === AUTH_HASH) {
-                localStorage.setItem(KEY, AUTH_HASH);
+                // 双写 localStorage + cookie
+                try { localStorage.setItem(KEY, AUTH_HASH); } catch(e) {}
+                setCookie(KEY, AUTH_HASH, COOKIE_DAYS);
                 gate.style.opacity = '0';
                 setTimeout(function(){ gate.style.display = 'none'; }, 300);
             } else {
@@ -97,6 +120,35 @@
                 <p>&copy; 2025 您的名字. 版权所有.</p>
             </div>
         </footer>
+
+        {% elif page.meta and page.meta.date %}
+        {# ====== 博客文章：自动从 frontmatter 渲染 ====== #}
+        <div class="page-content-wrapper">
+            <div class="blog-post-wrapper">
+                <a href="{{ base_url }}/blog/" class="back-button scroll-animate" style="opacity:0;">&larr; 返回随笔</a>
+
+                {% if page.meta.cover %}
+                <div class="blog-post-cover scroll-animate" style="opacity:0;">
+                    <img src="{{ base_url }}/images/{{ page.meta.cover }}" alt="{{ page.title }}">
+                </div>
+                {% endif %}
+
+                <div class="blog-post-header scroll-animate" style="opacity:0;">
+                    <h1>{{ page.title }}</h1>
+                    <div class="blog-post-meta">
+                        <span>{{ page.meta.date }}</span>
+                        {% if page.meta.tag %}
+                        <span>&middot;</span>
+                        <span>{{ page.meta.tag }}</span>
+                        {% endif %}
+                    </div>
+                </div>
+
+                <div class="blog-post-content scroll-animate" style="opacity:0;">
+                    {{ page.content }}
+                </div>
+            </div>
+        </div>
 
         {% else %}
         <div class="page-content-wrapper">
