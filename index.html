@@ -1,0 +1,189 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>My Docs</title>
+    <link rel="stylesheet" href="./css/style.css">
+</head>
+<body>
+    <!-- ====== 密码门 ====== -->
+    <div id="auth-gate">
+        <div class="auth-box">
+            <div class="auth-icon">
+                <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+            </div>
+            <p class="auth-hint">请输入访问密码</p>
+            <div class="auth-input-row">
+                <input type="password" id="auth-pass" placeholder="密码" autocomplete="off">
+                <button id="auth-btn">进入</button>
+            </div>
+            <p id="auth-error" class="auth-error"></p>
+        </div>
+    </div>
+    <script>
+    // ===== 修改这里的哈希值来更换密码 =====
+    // 当前密码: "limneticfisher" 的 SHA-256 哈希
+    // 更换密码方法: 在浏览器控制台运行:
+    //   crypto.subtle.digest('SHA-256', new TextEncoder().encode('你的新密码')).then(b=>console.log([...new Uint8Array(b)].map(x=>x.toString(16).padStart(2,'0')).join('')))
+    // 把输出的哈希值替换下面的字符串即可
+    var AUTH_HASH = 'c8bff3c7ab6daea56b1e521d0e8172b33fca607e5b98e950c978a3b26be62a10';
+
+    (function(){
+        var KEY = 'site_auth_token';
+        var COOKIE_DAYS = 365; // cookie 保存天数
+        var gate = document.getElementById('auth-gate');
+
+        // 读取 cookie
+        function getCookie(name) {
+            var match = document.cookie.match(new RegExp('(^| )' + name + '=([^;]+)'));
+            return match ? match[2] : null;
+        }
+
+        // 写入 cookie（跨所有路径）
+        function setCookie(name, value, days) {
+            var d = new Date();
+            d.setTime(d.getTime() + days * 86400000);
+            document.cookie = name + '=' + value + ';expires=' + d.toUTCString() + ';path=/;SameSite=Lax';
+        }
+
+        // 检查是否已验证：localStorage 或 cookie 任一命中即放行
+        var authed = false;
+        try { authed = localStorage.getItem(KEY) === AUTH_HASH; } catch(e) {}
+        if (!authed) authed = getCookie(KEY) === AUTH_HASH;
+
+        if (authed) {
+            gate.style.display = 'none';
+            // 双写确保两边都有
+            try { localStorage.setItem(KEY, AUTH_HASH); } catch(e) {}
+            setCookie(KEY, AUTH_HASH, COOKIE_DAYS);
+        }
+
+        async function sha256(str) {
+            var buf = await crypto.subtle.digest('SHA-256', new TextEncoder().encode(str));
+            return [...new Uint8Array(buf)].map(function(x){return x.toString(16).padStart(2,'0')}).join('');
+        }
+
+        async function tryAuth() {
+            var input = document.getElementById('auth-pass');
+            var hash = await sha256(input.value);
+            if (hash === AUTH_HASH) {
+                // 双写 localStorage + cookie
+                try { localStorage.setItem(KEY, AUTH_HASH); } catch(e) {}
+                setCookie(KEY, AUTH_HASH, COOKIE_DAYS);
+                gate.style.opacity = '0';
+                setTimeout(function(){ gate.style.display = 'none'; }, 300);
+            } else {
+                var err = document.getElementById('auth-error');
+                err.textContent = '密码错误，请重试';
+                input.value = '';
+                input.focus();
+            }
+        }
+
+        document.getElementById('auth-btn').addEventListener('click', tryAuth);
+        document.getElementById('auth-pass').addEventListener('keydown', function(e){
+            if (e.key === 'Enter') tryAuth();
+        });
+    })();
+    </script>
+
+    <header class="header">
+        <div class="header-container">
+            <a href="." class="header-brand">My Docs</a>
+
+            <div class="header-right-controls">
+                <button type="button" id="theme-toggle" title="切换日间/夜间模式">
+                    <svg id="icon-sun" xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/></svg>
+                    <svg id="icon-moon" class="hidden" xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>
+                </button>
+
+                <nav class="header-nav">
+                    <ul>
+                       
+                        <li class="active">
+                           <a href=".">Home</a>
+                        </li>
+                       
+                        <li class="">
+                           <a href="resources/">Resources</a>
+                        </li>
+                       
+                        <li class="">
+                           <a href="tools/">Tools</a>
+                        </li>
+                       
+                        <li class="">
+                           <a href="blog/">Blog</a>
+                        </li>
+                       
+                    </ul>
+                </nav>
+            </div>
+        </div>
+    </header>
+
+    <main class="main-content">
+        
+        <div class="hero-section">
+    <div class="hero-image-column">
+        <div class="image-zoom-container">
+            <img id="hero-image" src="images/dark.webp" alt="个人主页图片">
+        </div>
+    </div>
+
+    <div class="hero-text-column" id="hero-text">
+        <div class="noise-layer"></div>
+        <div class="glow-orb glow-orb-1"></div>
+        <div class="glow-orb glow-orb-2"></div>
+        <canvas id="celestial-canvas"></canvas>
+        <div class="particle"></div>
+        <div class="particle"></div>
+        <div class="particle"></div>
+        <div class="particle"></div>
+        <div class="particle"></div>
+
+        <div class="hero-inner-content">
+            <div class="time-widget">
+                <div class="time-main" id="time-main">00:00<span class="time-sec" id="time-sec">00</span></div>
+                <div class="time-date" id="time-date">2025.01.01<span class="time-weekday" id="time-weekday">星期三</span></div>
+            </div>
+
+            <h1>落日熔金<br>暮云合璧<br>人在何处</h1>
+            <p class="hero-subtitle">历史，你好！</p>
+
+            <div class="search-container">
+                <form id="search-form" class="bing-search-form"
+                      action="https://www.bing.com/search"
+                      method="get" target="_blank" data-engine="bing">
+
+                    <button type="button" id="search-engine-switch" title="切换搜索引擎">
+                        <svg class="search-engine-icon" id="icon-bing" xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24"><path fill="currentColor" d="m10.833 3.065l4.333 2.253v13.5l-4.333 2.182l-5.62-3.248V6.29L10.833 3.065ZM6.21 6.556l4.623-2.67v13.5l-4.623-2.348V6.556Z"/></svg>
+                        <svg class="search-engine-icon hidden" id="icon-google" xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24"><path fill="currentColor" d="M21.35 11.1h-9.35v2.9h5.65q-.5 2.1-2.2 3.25t-4.1.25q-3.4 0-5.8-2.35t-2.4-5.65q0-3.3 2.4-5.65t5.8-2.35q1.7 0 3.25.75t2.55 2l2.2-2.2q-2.1-2-5.2-2q-4.4 0-7.5 3.15T3 12.05q0 4.4 3.15 7.55t7.55 3.15q4.1 0 6.8-2.8t2.7-6.8q0-.6-.05-1.1Z"/></svg>
+                    </button>
+
+                    <input id="search-input" type="text" name="q" placeholder="在必应上搜索..." autocomplete="off">
+                    <button type="submit" aria-label="搜索">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" viewBox="0 0 16 16">
+                            <path d="M11.742 10.344a6.5 6.5 0 1 0-1.397 1.398h-.001c.03.04.062.078.098.115l3.85 3.85a1 1 0 0 0 1.415-1.414l-3.85-3.85a1.007 1.007 0 0 0-.115-.1zM12 6.5a5.5 5.5 0 1 1-11 0 5.5 5.5 0 0 1 11 0z"/>
+                        </svg>
+                    </button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+        <footer class="footer">
+            <div class="container">
+                <p>&copy; 2025 您的名字. 版权所有.</p>
+            </div>
+        </footer>
+
+        
+    </main>
+
+    <script>var base_url = '.';</script>
+    <script src="./js/main.js" defer></script>
+</body>
+</html>

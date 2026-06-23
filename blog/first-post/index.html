@@ -1,0 +1,179 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>My Docs</title>
+    <link rel="stylesheet" href="../../css/style.css">
+</head>
+<body>
+    <!-- ====== 密码门 ====== -->
+    <div id="auth-gate">
+        <div class="auth-box">
+            <div class="auth-icon">
+                <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+            </div>
+            <p class="auth-hint">请输入访问密码</p>
+            <div class="auth-input-row">
+                <input type="password" id="auth-pass" placeholder="密码" autocomplete="off">
+                <button id="auth-btn">进入</button>
+            </div>
+            <p id="auth-error" class="auth-error"></p>
+        </div>
+    </div>
+    <script>
+    // ===== 修改这里的哈希值来更换密码 =====
+    // 当前密码: "limneticfisher" 的 SHA-256 哈希
+    // 更换密码方法: 在浏览器控制台运行:
+    //   crypto.subtle.digest('SHA-256', new TextEncoder().encode('你的新密码')).then(b=>console.log([...new Uint8Array(b)].map(x=>x.toString(16).padStart(2,'0')).join('')))
+    // 把输出的哈希值替换下面的字符串即可
+    var AUTH_HASH = 'c8bff3c7ab6daea56b1e521d0e8172b33fca607e5b98e950c978a3b26be62a10';
+
+    (function(){
+        var KEY = 'site_auth_token';
+        var COOKIE_DAYS = 365; // cookie 保存天数
+        var gate = document.getElementById('auth-gate');
+
+        // 读取 cookie
+        function getCookie(name) {
+            var match = document.cookie.match(new RegExp('(^| )' + name + '=([^;]+)'));
+            return match ? match[2] : null;
+        }
+
+        // 写入 cookie（跨所有路径）
+        function setCookie(name, value, days) {
+            var d = new Date();
+            d.setTime(d.getTime() + days * 86400000);
+            document.cookie = name + '=' + value + ';expires=' + d.toUTCString() + ';path=/;SameSite=Lax';
+        }
+
+        // 检查是否已验证：localStorage 或 cookie 任一命中即放行
+        var authed = false;
+        try { authed = localStorage.getItem(KEY) === AUTH_HASH; } catch(e) {}
+        if (!authed) authed = getCookie(KEY) === AUTH_HASH;
+
+        if (authed) {
+            gate.style.display = 'none';
+            // 双写确保两边都有
+            try { localStorage.setItem(KEY, AUTH_HASH); } catch(e) {}
+            setCookie(KEY, AUTH_HASH, COOKIE_DAYS);
+        }
+
+        async function sha256(str) {
+            var buf = await crypto.subtle.digest('SHA-256', new TextEncoder().encode(str));
+            return [...new Uint8Array(buf)].map(function(x){return x.toString(16).padStart(2,'0')}).join('');
+        }
+
+        async function tryAuth() {
+            var input = document.getElementById('auth-pass');
+            var hash = await sha256(input.value);
+            if (hash === AUTH_HASH) {
+                // 双写 localStorage + cookie
+                try { localStorage.setItem(KEY, AUTH_HASH); } catch(e) {}
+                setCookie(KEY, AUTH_HASH, COOKIE_DAYS);
+                gate.style.opacity = '0';
+                setTimeout(function(){ gate.style.display = 'none'; }, 300);
+            } else {
+                var err = document.getElementById('auth-error');
+                err.textContent = '密码错误，请重试';
+                input.value = '';
+                input.focus();
+            }
+        }
+
+        document.getElementById('auth-btn').addEventListener('click', tryAuth);
+        document.getElementById('auth-pass').addEventListener('keydown', function(e){
+            if (e.key === 'Enter') tryAuth();
+        });
+    })();
+    </script>
+
+    <header class="header">
+        <div class="header-container">
+            <a href="../.." class="header-brand">My Docs</a>
+
+            <div class="header-right-controls">
+                <button type="button" id="theme-toggle" title="切换日间/夜间模式">
+                    <svg id="icon-sun" xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/></svg>
+                    <svg id="icon-moon" class="hidden" xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>
+                </button>
+
+                <nav class="header-nav">
+                    <ul>
+                       
+                        <li class="">
+                           <a href="../..">Home</a>
+                        </li>
+                       
+                        <li class="">
+                           <a href="../../resources/">Resources</a>
+                        </li>
+                       
+                        <li class="">
+                           <a href="../../tools/">Tools</a>
+                        </li>
+                       
+                        <li class="">
+                           <a href="../">Blog</a>
+                        </li>
+                       
+                    </ul>
+                </nav>
+            </div>
+        </div>
+    </header>
+
+    <main class="main-content">
+        
+        
+        <div class="page-content-wrapper">
+            <div class="blog-post-wrapper">
+                <a href="../../blog/" class="back-button scroll-animate" style="opacity:0;">&larr; 返回随笔</a>
+
+                
+                <div class="blog-post-cover scroll-animate" style="opacity:0;">
+                    <img src="../../images/dark.webp" alt="写在开始之前">
+                </div>
+                
+
+                <div class="blog-post-header scroll-animate" style="opacity:0;">
+                    <h1>写在开始之前</h1>
+                    <div class="blog-post-meta">
+                        <span>2025.06.22</span>
+                        
+                        <span>&middot;</span>
+                        <span>随想</span>
+                        
+                    </div>
+                </div>
+
+                <div class="blog-post-content scroll-animate" style="opacity:0;">
+                    <p>这是博客的第一篇文章，也是一个模板。你可以在这里写下任何想法、读书笔记、研究随感。</p>
+<h2 id="_1">如何添加新文章</h2>
+<p>在 <code>docs/blog/</code> 目录下创建新的 <code>.md</code> 文件，在文件开头添加 frontmatter：</p>
+<pre><code class="language-yaml">---
+title: 你的标题
+date: 2025.07.01
+tag: 标签
+cover: 封面图文件名.webp
+---
+</code></pre>
+<p>然后用正常的 Markdown 写正文即可。封面图放在 <code>docs/images/</code> 目录下。</p>
+<h2 id="_2">示例：引用</h2>
+<blockquote>
+<p>落日熔金，暮云合璧，人在何处。染柳烟浓，吹梅笛怨，春意知几许。——李清照《永遇乐》</p>
+</blockquote>
+<h2 id="_3">示例：段落</h2>
+<p>历史的书写从来不是单一视角的叙事。每一份档案、每一方碑刻，都承载着特定时空中人的选择与命运。当我们翻开泛黄的故纸堆，试图还原那些被时间模糊的面孔时，我们其实也在审视自己——我们如何理解过去，往往决定了我们如何面对当下。</p>
+<p>这个博客将记录一些零散的思考，关于历史，关于阅读，关于生活中那些值得驻足的瞬间。</p>
+                </div>
+            </div>
+        </div>
+
+        
+    </main>
+
+    <script>var base_url = '../..';</script>
+    <script src="../../js/main.js" defer></script>
+</body>
+</html>
