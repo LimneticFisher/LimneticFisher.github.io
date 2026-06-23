@@ -6,6 +6,17 @@
 
     <div class="blog-list">
 
+        <a href="../blog/likui/" class="blog-item scroll-animate">
+            <div class="blog-text">
+                <span class="blog-title">李逵问题</span>
+                <div class="blog-meta">
+                    <span class="blog-date">2025.06.22</span>
+                    <span class="blog-tag">随想</span>
+                </div>
+            </div>
+            <img class="blog-thumb" src="../images/likui.webp" alt="李逵问题">
+        </a>
+
         <a href="../blog/first-post/" class="blog-item scroll-animate">
             <div class="blog-text">
                 <span class="blog-title">写在开始之前</span>
