@@ -1,5 +1,6 @@
 <div class="page-title-bar">
-    <h1 class="scroll-animate" style="opacity: 0;">资源指北</h1>
+    <h1 class="scroll-animate">资源指北</h1>
+    <p class="page-lede scroll-animate">历史研究常用的数据库与史料检索入口。</p>
 </div>
 
 <div class="resources-container">

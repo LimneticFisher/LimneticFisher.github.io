@@ -1,5 +1,6 @@
 <div class="page-title-bar">
-    <h1 class="scroll-animate" style="opacity: 0;">工具箱</h1>
+    <h1 class="scroll-animate">工具箱</h1>
+    <p class="page-lede scroll-animate">为桌游与日常准备的小工具。</p>
 </div>
 
 <div class="resources-container">
@@ -18,13 +19,13 @@
             </div>
         </a>
 
-        <div class="tool-card scroll-animate" style="cursor: default; opacity: 0;">
-            <div class="tool-icon-box" style="opacity: 0.3;">
+        <div class="tool-card tool-card--placeholder scroll-animate">
+            <div class="tool-icon-box">
                 <svg xmlns="http://www.w3.org/2000/svg" width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
             </div>
             <div class="card-content">
-                <h3 style="color: var(--text-tertiary);">更多工具即将到来</h3>
-                <p style="color: var(--text-tertiary);">敬请期待...</p>
+                <h3>更多工具即将到来</h3>
+                <p>敬请期待</p>
             </div>
         </div>
 

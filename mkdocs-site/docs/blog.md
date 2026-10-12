@@ -1,5 +1,6 @@
 <div class="page-title-bar">
-    <h1 class="scroll-animate" style="opacity: 0;">随笔</h1>
+    <h1 class="scroll-animate">随笔</h1>
+    <p class="page-lede scroll-animate">读书、推理与历史之间的零散想法。</p>
 </div>
 
 <div class="blog-container">

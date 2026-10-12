@@ -1,6 +1,6 @@
-site_name: My Docs
+site_name: LimneticFisher
 site_url: https://limneticfisher.github.io/
-site_author: 你的名字
+site_author: LimneticFisher
 theme:
   name: null
   custom_dir: custom_theme
