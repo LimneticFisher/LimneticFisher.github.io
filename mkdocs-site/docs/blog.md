@@ -7,6 +7,17 @@
 
     <div class="blog-list">
 
+        <a href="../blog/houbaoyanshidai/" class="blog-item scroll-animate">
+            <div class="blog-text">
+                <span class="blog-title">后保研时代</span>
+                <div class="blog-meta">
+                    <span class="blog-date">2026.10.14</span>
+                    <span class="blog-tag">随想</span>
+                </div>
+            </div>
+            <img class="blog-thumb" src="../images/houbaoyanshidai.webp" alt="后保研时代">
+        </a>
+
         <a href="../blog/likui/" class="blog-item scroll-animate">
             <div class="blog-text">
                 <span class="blog-title">李逵问题</span>
