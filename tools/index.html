@@ -1,0 +1,185 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+    <title>Tools · LimneticFisher</title>
+    <meta name="theme-color" content="#000000">
+    <script>
+    (function(){
+        var d = document.documentElement;
+        d.classList.add('js');
+        try { if (localStorage.getItem('theme') === 'light') d.classList.add('light-mode'); } catch(e) {}
+    })();
+    </script>
+    <link rel="stylesheet" href="../css/style.css">
+</head>
+<body>
+    <div id="auth-gate">
+        <div class="auth-box">
+            <div class="auth-icon">
+                <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="11" width="16" height="10" rx="2.5"/><path d="M8 11V7.5a4 4 0 0 1 8 0V11"/></svg>
+            </div>
+            <h1 class="auth-title">LimneticFisher</h1>
+            <p class="auth-hint">请输入访问密码</p>
+            <div class="auth-input-row">
+                <input type="password" id="auth-pass" placeholder="密码" autocomplete="off" aria-label="密码">
+                <button id="auth-btn" aria-label="进入">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
+                </button>
+            </div>
+            <p id="auth-error" class="auth-error"></p>
+        </div>
+    </div>
+    
+    <script>
+    var AUTH_HASH = 'c8bff3c7ab6daea56b1e521d0e8172b33fca607e5b98e950c978a3b26be62a10';
+
+    (function(){
+        var KEY = 'site_auth_token';
+        var COOKIE_DAYS = 365;
+        var gate = document.getElementById('auth-gate');
+
+        function getCookie(name) {
+            var match = document.cookie.match(new RegExp('(^| )' + name + '=([^;]+)'));
+            return match ? match[2] : null;
+        }
+
+        function setCookie(name, value, days) {
+            var d = new Date();
+            d.setTime(d.getTime() + days * 86400000);
+            document.cookie = name + '=' + value + ';expires=' + d.toUTCString() + ';path=/;SameSite=Lax';
+        }
+
+        var authed = false;
+        try { authed = localStorage.getItem(KEY) === AUTH_HASH; } catch(e) {}
+        if (!authed) authed = getCookie(KEY) === AUTH_HASH;
+
+        if (authed) {
+            gate.style.display = 'none';
+            try { localStorage.setItem(KEY, AUTH_HASH); } catch(e) {}
+            setCookie(KEY, AUTH_HASH, COOKIE_DAYS);
+        } else {
+            document.documentElement.classList.add('auth-locked');
+        }
+
+        async function sha256(str) {
+            var buf = await crypto.subtle.digest('SHA-256', new TextEncoder().encode(str));
+            return [...new Uint8Array(buf)].map(function(x){return x.toString(16).padStart(2,'0')}).join('');
+        }
+
+        async function tryAuth() {
+            var input = document.getElementById('auth-pass');
+            var box = gate.querySelector('.auth-box');
+            var hash = await sha256(input.value);
+            if (hash === AUTH_HASH) {
+                try { localStorage.setItem(KEY, AUTH_HASH); } catch(e) {}
+                setCookie(KEY, AUTH_HASH, COOKIE_DAYS);
+                gate.classList.add('is-leaving');
+                document.documentElement.classList.remove('auth-locked');
+                setTimeout(function(){ gate.style.display = 'none'; }, 700);
+            } else {
+                var err = document.getElementById('auth-error');
+                err.textContent = '密码错误，请重试';
+                input.value = '';
+                input.focus();
+                box.classList.remove('is-shaking');
+                void box.offsetWidth;
+                box.classList.add('is-shaking');
+            }
+        }
+
+        document.getElementById('auth-btn').addEventListener('click', tryAuth);
+        document.getElementById('auth-pass').addEventListener('keydown', function(e){
+            if (e.key === 'Enter') tryAuth();
+        });
+    })();
+    </script>
+
+    <header class="header">
+        <div class="header-container">
+            <a href=".." class="header-brand">LimneticFisher</a>
+
+            <div class="header-right-controls">
+                <nav class="header-nav">
+                    <ul>
+                       
+                        <li class="">
+                           <a href="..">Home</a>
+                        </li>
+                       
+                        <li class="">
+                           <a href="../resources/">Resources</a>
+                        </li>
+                       
+                        <li class="active">
+                           <a href="./">Tools</a>
+                        </li>
+                       
+                        <li class="">
+                           <a href="../blog/">Blog</a>
+                        </li>
+                       
+                    </ul>
+                </nav>
+
+                <button type="button" id="theme-toggle" title="切换日间/夜间模式" aria-label="切换日间/夜间模式">
+                    <svg id="icon-sun" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="4.5"/><line x1="12" y1="1.5" x2="12" y2="3.5"/><line x1="12" y1="20.5" x2="12" y2="22.5"/><line x1="4.6" y1="4.6" x2="6" y2="6"/><line x1="18" y1="18" x2="19.4" y2="19.4"/><line x1="1.5" y1="12" x2="3.5" y2="12"/><line x1="20.5" y1="12" x2="22.5" y2="12"/><line x1="4.6" y1="19.4" x2="6" y2="18"/><line x1="18" y1="6" x2="19.4" y2="4.6"/></svg>
+                    <svg id="icon-moon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>
+                </button>
+            </div>
+        </div>
+    </header>
+
+    <main class="main-content">
+        
+        <div class="page-content-wrapper">
+            <div class="page-title-bar">
+    <h1 class="scroll-animate">工具箱</h1>
+    <p class="page-lede scroll-animate">为桌游与日常准备的小工具。</p>
+</div>
+
+<div class="resources-container">
+
+    <h2 class="section-title scroll-animate">桌游辅助</h2>
+    <div class="resource-grid">
+
+        <a href="../tools/zombicide_deck.html" class="tool-card scroll-animate" target="_blank">
+            <div class="card-arrow">&#8599;</div>
+            <div class="tool-icon-box">
+                <svg xmlns="http://www.w3.org/2000/svg" width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg>
+            </div>
+            <div class="card-content">
+                <h3>Zombicide 抽卡器</h3>
+                <p>Zombicide 桌游的 Abomination 抽卡与技能查询工具</p>
+            </div>
+        </a>
+
+        <div class="tool-card tool-card--placeholder scroll-animate">
+            <div class="tool-icon-box">
+                <svg xmlns="http://www.w3.org/2000/svg" width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+            </div>
+            <div class="card-content">
+                <h3>更多工具即将到来</h3>
+                <p>敬请期待</p>
+            </div>
+        </div>
+
+    </div>
+
+</div>
+        </div>
+        
+    </main>
+
+    <footer class="site-footer">
+        <div class="footer-inner">
+            <span>&copy; 2026 LimneticFisher</span>
+            <span class="footer-motto">落日熔金，暮云合璧</span>
+        </div>
+    </footer>
+
+    <script>var base_url = '..';</script>
+    <script src="../js/main.js" defer></script>
+</body>
+</html>

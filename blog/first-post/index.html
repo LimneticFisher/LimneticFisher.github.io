@@ -1,0 +1,191 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+    <title>写在开始之前 · LimneticFisher</title>
+    <meta name="theme-color" content="#000000">
+    <script>
+    (function(){
+        var d = document.documentElement;
+        d.classList.add('js');
+        try { if (localStorage.getItem('theme') === 'light') d.classList.add('light-mode'); } catch(e) {}
+    })();
+    </script>
+    <link rel="stylesheet" href="../../css/style.css">
+</head>
+<body>
+    <div id="auth-gate">
+        <div class="auth-box">
+            <div class="auth-icon">
+                <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="11" width="16" height="10" rx="2.5"/><path d="M8 11V7.5a4 4 0 0 1 8 0V11"/></svg>
+            </div>
+            <h1 class="auth-title">LimneticFisher</h1>
+            <p class="auth-hint">请输入访问密码</p>
+            <div class="auth-input-row">
+                <input type="password" id="auth-pass" placeholder="密码" autocomplete="off" aria-label="密码">
+                <button id="auth-btn" aria-label="进入">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
+                </button>
+            </div>
+            <p id="auth-error" class="auth-error"></p>
+        </div>
+    </div>
+    
+    <script>
+    var AUTH_HASH = 'c8bff3c7ab6daea56b1e521d0e8172b33fca607e5b98e950c978a3b26be62a10';
+
+    (function(){
+        var KEY = 'site_auth_token';
+        var COOKIE_DAYS = 365;
+        var gate = document.getElementById('auth-gate');
+
+        function getCookie(name) {
+            var match = document.cookie.match(new RegExp('(^| )' + name + '=([^;]+)'));
+            return match ? match[2] : null;
+        }
+
+        function setCookie(name, value, days) {
+            var d = new Date();
+            d.setTime(d.getTime() + days * 86400000);
+            document.cookie = name + '=' + value + ';expires=' + d.toUTCString() + ';path=/;SameSite=Lax';
+        }
+
+        var authed = false;
+        try { authed = localStorage.getItem(KEY) === AUTH_HASH; } catch(e) {}
+        if (!authed) authed = getCookie(KEY) === AUTH_HASH;
+
+        if (authed) {
+            gate.style.display = 'none';
+            try { localStorage.setItem(KEY, AUTH_HASH); } catch(e) {}
+            setCookie(KEY, AUTH_HASH, COOKIE_DAYS);
+        } else {
+            document.documentElement.classList.add('auth-locked');
+        }
+
+        async function sha256(str) {
+            var buf = await crypto.subtle.digest('SHA-256', new TextEncoder().encode(str));
+            return [...new Uint8Array(buf)].map(function(x){return x.toString(16).padStart(2,'0')}).join('');
+        }
+
+        async function tryAuth() {
+            var input = document.getElementById('auth-pass');
+            var box = gate.querySelector('.auth-box');
+            var hash = await sha256(input.value);
+            if (hash === AUTH_HASH) {
+                try { localStorage.setItem(KEY, AUTH_HASH); } catch(e) {}
+                setCookie(KEY, AUTH_HASH, COOKIE_DAYS);
+                gate.classList.add('is-leaving');
+                document.documentElement.classList.remove('auth-locked');
+                setTimeout(function(){ gate.style.display = 'none'; }, 700);
+            } else {
+                var err = document.getElementById('auth-error');
+                err.textContent = '密码错误，请重试';
+                input.value = '';
+                input.focus();
+                box.classList.remove('is-shaking');
+                void box.offsetWidth;
+                box.classList.add('is-shaking');
+            }
+        }
+
+        document.getElementById('auth-btn').addEventListener('click', tryAuth);
+        document.getElementById('auth-pass').addEventListener('keydown', function(e){
+            if (e.key === 'Enter') tryAuth();
+        });
+    })();
+    </script>
+
+    <header class="header">
+        <div class="header-container">
+            <a href="../.." class="header-brand">LimneticFisher</a>
+
+            <div class="header-right-controls">
+                <nav class="header-nav">
+                    <ul>
+                       
+                        <li class="">
+                           <a href="../..">Home</a>
+                        </li>
+                       
+                        <li class="">
+                           <a href="../../resources/">Resources</a>
+                        </li>
+                       
+                        <li class="">
+                           <a href="../../tools/">Tools</a>
+                        </li>
+                       
+                        <li class="">
+                           <a href="../">Blog</a>
+                        </li>
+                       
+                    </ul>
+                </nav>
+
+                <button type="button" id="theme-toggle" title="切换日间/夜间模式" aria-label="切换日间/夜间模式">
+                    <svg id="icon-sun" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="4.5"/><line x1="12" y1="1.5" x2="12" y2="3.5"/><line x1="12" y1="20.5" x2="12" y2="22.5"/><line x1="4.6" y1="4.6" x2="6" y2="6"/><line x1="18" y1="18" x2="19.4" y2="19.4"/><line x1="1.5" y1="12" x2="3.5" y2="12"/><line x1="20.5" y1="12" x2="22.5" y2="12"/><line x1="4.6" y1="19.4" x2="6" y2="18"/><line x1="18" y1="6" x2="19.4" y2="4.6"/></svg>
+                    <svg id="icon-moon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>
+                </button>
+            </div>
+        </div>
+    </header>
+
+    <main class="main-content">
+        
+        <div class="page-content-wrapper">
+            <article class="blog-post-wrapper">
+                <a href="../../blog/" class="back-button scroll-animate">
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"/></svg>
+                    随笔
+                </a>
+
+                <header class="blog-post-header scroll-animate">
+                    <p class="blog-post-eyebrow">随想</p>
+                    <h1>写在开始之前</h1>
+                    <p class="blog-post-meta">2025.06.22</p>
+                </header>
+
+                
+                <figure class="blog-post-cover scroll-animate">
+                    <img src="../../images/dark.webp" alt="写在开始之前">
+                </figure>
+                
+
+                <div class="blog-post-content scroll-animate">
+                    <p>这是博客的第一篇文章，也是一个模板。你可以在这里写下任何想法、读书笔记、研究随感。</p>
+<h2 id="_1">如何添加新文章</h2>
+<p>在 <code>docs/blog/</code> 目录下创建新的 <code>.md</code> 文件，在文件开头添加 frontmatter：</p>
+<pre><code class="language-yaml">---
+title: 你的标题
+date: 2025.07.01
+tag: 标签
+cover: 封面图文件名.webp
+---
+</code></pre>
+<p>然后用正常的 Markdown 写正文即可。封面图放在 <code>docs/images/</code> 目录下。</p>
+<h2 id="_2">示例：引用</h2>
+<blockquote>
+<p>落日熔金，暮云合璧，人在何处。染柳烟浓，吹梅笛怨，春意知几许。——李清照《永遇乐》</p>
+</blockquote>
+<h2 id="_3">示例：段落</h2>
+<p>历史的书写从来不是单一视角的叙事。每一份档案、每一方碑刻，都承载着特定时空中人的选择与命运。当我们翻开泛黄的故纸堆，试图还原那些被时间模糊的面孔时，我们其实也在审视自己——我们如何理解过去，往往决定了我们如何面对当下。</p>
+<p>这个博客将记录一些零散的思考，关于历史，关于阅读，关于生活中那些值得驻足的瞬间。</p>
+                </div>
+            </article>
+        </div>
+
+        
+    </main>
+
+    <footer class="site-footer">
+        <div class="footer-inner">
+            <span>&copy; 2026 LimneticFisher</span>
+            <span class="footer-motto">落日熔金，暮云合璧</span>
+        </div>
+    </footer>
+
+    <script>var base_url = '../..';</script>
+    <script src="../../js/main.js" defer></script>
+</body>
+</html>
