@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+    <title>后保研时代 · LimneticFisher</title>
+    <meta name="theme-color" content="#000000">
+    <script>
+    (function(){
+        var d = document.documentElement;
+        d.classList.add('js');
+        try { if (localStorage.getItem('theme') === 'light') d.classList.add('light-mode'); } catch(e) {}
+    })();
+    </script>
+    <link rel="stylesheet" href="../../css/style.css">
+</head>
+<body>
+    <header class="header">
+        <div class="header-container">
+            <a href="../.." class="header-brand">
+                <svg class="brand-mark" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                    <rect class="brand-draw" pathLength="100" x="3.5" y="3.5" width="17" height="17" rx="4"/>
+                    <path class="brand-draw brand-draw--inner" pathLength="100" d="M8 15.5c2-3.5 4.5-6 8-7.5"/>
+                    <circle cx="16.5" cy="15.5" r="1.2" fill="currentColor" stroke="none"/>
+                </svg>
+                <span>LimneticFisher</span>
+            </a>
+
+            <div class="header-right-controls">
+                <nav class="header-nav">
+                    <ul>
+                       
+                        <li class="">
+                           <a href="../..">Home</a>
+                        </li>
+                       
+                        <li class="">
+                           <a href="../../resources/">Resources</a>
+                        </li>
+                       
+                        <li class="">
+                           <a href="../../tools/">Tools</a>
+                        </li>
+                       
+                        <li class="">
+                           <a href="../">Blog</a>
+                        </li>
+                       
+                    </ul>
+                </nav>
+
+                <button type="button" id="theme-toggle" title="切换日间/夜间模式" aria-label="切换日间/夜间模式">
+                    <svg id="icon-sun" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="4.5"/><line x1="12" y1="1.5" x2="12" y2="3.5"/><line x1="12" y1="20.5" x2="12" y2="22.5"/><line x1="4.6" y1="4.6" x2="6" y2="6"/><line x1="18" y1="18" x2="19.4" y2="19.4"/><line x1="1.5" y1="12" x2="3.5" y2="12"/><line x1="20.5" y1="12" x2="22.5" y2="12"/><line x1="4.6" y1="19.4" x2="6" y2="18"/><line x1="18" y1="6" x2="19.4" y2="4.6"/></svg>
+                    <svg id="icon-moon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>
+                </button>
+            </div>
+        </div>
+    </header>
+
+    <main class="main-content">
+        
+        <div class="read-progress" aria-hidden="true"></div>
+        <div class="page-content-wrapper">
+            <div class="page-hero-backdrop" aria-hidden="true">
+                <img class="page-backdrop-img page-backdrop-dark" src="../../images/dark.webp" alt="">
+                <img class="page-backdrop-img page-backdrop-light" src="../../images/light.webp" alt="">
+            </div>
+            <article class="blog-post-wrapper">
+                <a href="../../blog/" class="back-button scroll-animate">
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"/></svg>
+                    随笔
+                </a>
+
+                <header class="blog-post-header scroll-animate">
+                    <p class="blog-post-eyebrow">随想</p>
+                    <h1>后保研时代</h1>
+                    <p class="blog-post-meta">2026.10.14 周三</p>
+                </header>
+
+                
+                <figure class="blog-post-cover scroll-animate">
+                    <img src="../../images/houbaoyanshidai.webp" alt="后保研时代">
+                </figure>
+                
+
+                <div class="blog-post-content scroll-animate">
+                    <p>保研之后，整个人都处于一个浑浑噩噩、终日无所事事的状态。今日又查了些许毕业论文的资料，竟发现有很多传教士的档案被遗漏了，且基本足以支撑新开一整个章节的内容。
+既然如此，那就加油吧。
+祝我的好同学、好朋友、好兄弟韦昆伦和徐嘉泽考研顺利，也祝我的好室友排尔哈提考研顺利。</p>
+                </div>
+
+                <nav class="blog-post-footer scroll-animate" aria-label="文章底部导航">
+                    <a href="../../blog/" class="post-footer-link">
+                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="15 18 9 12 15 6"/></svg>
+                        <span>返回随笔目录</span>
+                    </a>
+                    <button type="button" class="post-footer-link back-to-top" id="back-to-top">
+                        <span>回到顶部</span>
+                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="18 15 12 9 6 15"/></svg>
+                    </button>
+                </nav>
+            </article>
+        </div>
+
+        
+    </main>
+
+    <footer class="site-footer">
+        <div class="footer-inner">
+            <span>&copy; 2026 LimneticFisher</span>
+            <span class="footer-motto">落日熔金，暮云合璧</span>
+        </div>
+    </footer>
+
+    <script>var base_url = '../..';</script>
+    <script src="../../js/main.js" defer></script>
+</body>
+</html>
